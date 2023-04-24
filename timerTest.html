@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<button id="start">start</button>
+<button id="stop">stop</button>
+<button id="reset">reset</button>
+<div id="time"></div>
+
+<script type="module">
+    import Timer from "./Timer.js";
+    const timer = new Timer();
+    const time_elm = document.querySelector("#time");
+
+    timer.onTimeUpdate = function(time){
+        time_elm.innerHTML = time;
+    }
+
+    document.querySelector("#start")
+    .addEventListener("click",()=>{
+        timer.start();
+    });
+
+    document.querySelector("#stop")
+    .addEventListener("click",()=>{
+        timer.stop();
+    });
+
+    document.querySelector("#reset")
+    .addEventListener("click",()=>{
+        timer.reset();
+    });
+</script>
