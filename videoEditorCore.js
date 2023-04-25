@@ -18,7 +18,7 @@ videoEditor.init = init;
 
 videoEditor.videoTrack = [];
 videoEditor.audioTrack = [];
-videoEditor.objectTrack = [];
+videoEditor.effectTrack = [];
 
 videoEditor.config = config;
 videoEditor.preview = preview;

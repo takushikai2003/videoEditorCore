@@ -1,5 +1,5 @@
 import Timer from "../timer.js";
-import videoEditor from "../videoEditor.js";
+import videoEditor from "../videoEditorCore.js";
 import config from "../config.js";
 import canvasEffects from "./canvasEffects.js";
 
@@ -7,12 +7,9 @@ const timer = new Timer();
 
 let canvas;
 let ctx;
-// canvas.width = config.encode.width;
-// canvas.height = config.encode.height;
-
 
 //previwで使用（内部がshiftされていくので深いコピー必須）
-let videoTrackCopy, audioTrackCopy, objectTrackCopy;
+let videoTrackCopy, audioTrackCopy, effectTrackCopy;
 
 let audioCtx, emptyNode, audioGain, videoAudioGain;
 // let soundDestinationConnected = false;
@@ -35,40 +32,40 @@ const preview = {
     onAudioStreamAvailable: function(){},
     seeking: false,
     
-    //arg: nowTime：途中から再生[秒]
-    play:async function(startTime = 0, encode=false, seek=false){
+    //arg: startTime：途中から再生[秒]
+    play: async function(startTime = 0, encode=false, seek=false){
 
         preview.nowTime = startTime;
 
         //トラックの深いコピー
         videoTrackCopy = Array.from(videoEditor.videoTrack);
         audioTrackCopy = Array.from(videoEditor.audioTrack);
-        objectTrackCopy = Array.from(videoEditor.objectTrack);
+        effectTrackCopy = Array.from(videoEditor.effectTrack);
 
         //previewLengthの値を決定
-        let videoLength=0, objectLength=0, audioLength=0;
+        let videoLength=0, effectLength=0, audioLength=0;
 
         if(videoTrackCopy.length != 0){
-            videoLength = videoTrackCopy[videoTrackCopy.length - 1].overallEndTime;
+            videoLength = videoTrackCopy[videoTrackCopy.length - 1].endTime;
         }
-        if(objectTrackCopy.length != 0){
-            objectLength = objectTrackCopy[objectTrackCopy.length - 1].overallEndTime;
+        if(effectTrackCopy.length != 0){
+            effectLength = effectTrackCopy[effectTrackCopy.length - 1].endTime;
         }
         if(audioTrackCopy.length != 0){
-            audioLength = audioTrackCopy[audioTrackCopy.length - 1].overallEndTime;
+            audioLength = audioTrackCopy[audioTrackCopy.length - 1].endTime;
         }
         
-        preview.length = Math.max(videoLength, objectLength, audioLength);
+        preview.length = Math.max(videoLength, effectLength, audioLength);
 
-        //途中から再生するために、overallEndTime未満のクリップは破棄
+        //途中から再生するために、endTime未満のクリップは破棄
         videoTrackCopy = videoTrackCopy.filter(clip => {
-            return (clip.overallEndTime >= preview.nowTime);
+            return (clip.endTime >= preview.nowTime);
         });
-        objectTrackCopy = objectTrackCopy.filter(clip => {
-            return (clip.overallEndTime >= preview.nowTime);
+        effectTrackCopy = effectTrackCopy.filter(clip => {
+            return (clip.endTime >= preview.nowTime);
         });
         audioTrackCopy = audioTrackCopy.filter(clip => {
-            return (clip.overallEndTime >= preview.nowTime);
+            return (clip.endTime >= preview.nowTime);
         });
 
 
@@ -133,7 +130,7 @@ const preview = {
         if(seek){
             preview.seeking = true;
             
-            await computeFrame(videoTrackCopy, audioTrackCopy, objectTrackCopy);
+            await computeFrame(videoTrackCopy, audioTrackCopy, effectTrackCopy);
             preview.pause();
             console.log("preview seeked");
             preview.seeking = false;
@@ -159,7 +156,7 @@ const preview = {
                 return;
             }
 
-            await computeFrame(videoTrackCopy, audioTrackCopy, objectTrackCopy);
+            await computeFrame(videoTrackCopy, audioTrackCopy, effectTrackCopy);
             preview.onTimeUpdate();
         }
         
@@ -247,7 +244,7 @@ async function computeFrame(videoTrack, audioTrack, effectTrack) {
 //-----------------------------------------------------
 //  トラック処理
 //(全体)：プロジェクト内の位置
-//(内部)：そのElmの位置（どこを切り取るか）。※Image,objectには無い。
+//(内部)：そのElmの位置（どこを切り取るか）。※Image,effectには無い。
 
 //per frame
 async function processVideoTrack(videoTrack){
@@ -257,7 +254,7 @@ async function processVideoTrack(videoTrack){
     if(videoTrack[0]!=undefined &&
         videoTrack[0].element.tagName == "VIDEO"
     ){
-        misalignment = Math.abs(videoTrack[0].element.currentTime + videoTrack[0].overallStartTime - videoTrack[0].internalStartTime - preview.nowTime);
+        misalignment = Math.abs(videoTrack[0].element.currentTime + videoTrack[0].startTime - videoTrack[0].relativeStartTime - preview.nowTime);
     }
 
     //今のelmが再生されていなければ
@@ -265,9 +262,9 @@ async function processVideoTrack(videoTrack){
         videoTrack[0]!=undefined &&
         videoTrack[0].element.tagName == "VIDEO" &&
         videoTrack[0].element.paused == true &&
-        preview.nowTime >= videoTrack[0].overallStartTime //いるのか微妙
+        preview.nowTime >= videoTrack[0].startTime //いるのか微妙
     ){
-        videoTrack[0].element.currentTime = Math.max(videoTrack[0].internalStartTime, preview.nowTime - videoTrack[0].overallStartTime);//startTime(内部)に飛ぶ
+        videoTrack[0].element.currentTime = Math.max(videoTrack[0].relativeStartTime, preview.nowTime - videoTrack[0].startTime);//startTime(内部)に飛ぶ
         videoAudioGain.gain.value = videoTrack[0].gain;//gain
         
         await videoTrack[0].element.play();
@@ -281,14 +278,14 @@ async function processVideoTrack(videoTrack){
     ){
         console.log("video misalignment: " + misalignment);
         timer.stop();
-        videoTrack[0].element.currentTime = preview.nowTime - (videoTrack[0].overallStartTime - videoTrack[0].internalStartTime);
+        videoTrack[0].element.currentTime = preview.nowTime - (videoTrack[0].startTime - videoTrack[0].relativeStartTime);
         await wait_seek(videoTrack[0].element);
         timer.start();
     }
 
     if( //endTimeを超えていたら
         videoTrack[0] != undefined &&
-        preview.nowTime > videoTrack[0].overallEndTime
+        preview.nowTime > videoTrack[0].endTime
     ){
         if(videoTrack[0].element.tagName == "VIDEO"){
             videoTrack[0].element.pause();
@@ -298,7 +295,7 @@ async function processVideoTrack(videoTrack){
     }
 
     //毎フレーム描画
-    if(videoTrack[0]!=undefined && preview.nowTime >= videoTrack[0].overallStartTime){
+    if(videoTrack[0]!=undefined && preview.nowTime >= videoTrack[0].startTime){
         const elm_width = videoTrack[0].element.width || videoTrack[0].element.videoWidth;
         const elm_height = videoTrack[0].element.height || videoTrack[0].element.videoHeight;
         
@@ -334,14 +331,14 @@ async function processAudioTrack(audioTrack){
     }
 
     //本来の位置とのずれ[s]
-    const misalignment = Math.abs(audioTrack[0].element.currentTime + audioTrack[0].overallStartTime - audioTrack[0].internalStartTime - preview.nowTime);
+    const misalignment = Math.abs(audioTrack[0].element.currentTime + audioTrack[0].startTime - audioTrack[0].relativeStartTime - preview.nowTime);
 
     //今のelmが再生されていなければ
     if(
         audioTrack[0].element.paused == true &&
-        preview.nowTime >= audioTrack[0].overallStartTime //いるのか微妙
+        preview.nowTime >= audioTrack[0].startTime //いるのか微妙
     ){
-        audioTrack[0].element.currentTime = Math.max(audioTrack[0].internalStartTime, preview.nowTime - audioTrack[0].overallStartTime);//startTime(内部)に飛ぶ
+        audioTrack[0].element.currentTime = Math.max(audioTrack[0].relativeStartTime, preview.nowTime - audioTrack[0].startTime);//startTime(内部)に飛ぶ
         audioGain.gain.value = audioTrack[0].gain;
 
         await audioTrack[0].element.play();//awaitしたほうがいいかも
@@ -355,14 +352,14 @@ async function processAudioTrack(audioTrack){
     ){
         console.log("audio misalignment: " + misalignment);
         timer.stop();
-        audioTrack[0].element.currentTime = preview.nowTime - (audioTrack[0].overallStartTime - audioTrack[0].internalStartTime);
+        audioTrack[0].element.currentTime = preview.nowTime - (audioTrack[0].startTime - audioTrack[0].relativeStartTime);
         await wait_seek(audioTrack[0].element);
         timer.start();
     }
 
 
     if( //endTimeを超えていたら
-        preview.nowTime > audioTrack[0].overallEndTime
+        preview.nowTime > audioTrack[0].endTime
     ){
         audioTrack[0].element.pause();
         audioTrack.shift();//次のobjへ
@@ -372,11 +369,11 @@ async function processAudioTrack(audioTrack){
 
 function processEffectTrack(effectTrack){
 
-    if(effectTrack[0]!=undefined && preview.nowTime > effectTrack[0].overallEndTime){ //endTimeを超えていたら
+    if(effectTrack[0]!=undefined && preview.nowTime > effectTrack[0].endTime){ //endTimeを超えていたら
         effectTrack.shift();//次のobjへ
     }
 
-    if(effectTrack[0]!=undefined && preview.nowTime >= effectTrack[0].overallStartTime){ //startTime以上なら
+    if(effectTrack[0]!=undefined && preview.nowTime >= effectTrack[0].startTime){ //startTime以上なら
         //描画処理へ
         for(let i=0; i<effectTrack[0].effect.length; i++){//内部のeffectの長さ分
             effectTrack[0].effect[i].function(effectTrack[0].effect[i].arguments);

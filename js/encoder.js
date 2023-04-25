@@ -1,4 +1,4 @@
-import videoEditor from "../videoEditor.js";
+import videoEditor from "../videoEditorCore.js";
 
 let canvas;
 let ctx;
