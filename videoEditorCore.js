@@ -4,25 +4,31 @@ import canvasEffects from "./js/canvasEffects.js";
 import preview from "./js/preview.js";
 import config from "./config.js";
 
-const videoEditor = {};
+const videoEditorCore = {};
 
-videoEditor.canvas;
-videoEditor.ctx;
+videoEditorCore.canvas;
+videoEditorCore.ctx;
 
 function init(canvas){
-    preview.init(canvas);
-    encoder.init(canvas);
+    config.preview.width = canvas.width;
+    config.preview.height = canvas.height;
+    config.preview.canvas = canvas;
+
+    config.encoder.canvas = canvas;
+
+    preview.init();
+    encoder.init();
 }
 
-videoEditor.init = init;
+videoEditorCore.init = init;
 
-videoEditor.videoTrack = [];
-videoEditor.audioTrack = [];
-videoEditor.effectTrack = [];
+videoEditorCore.videoTrack = [];
+videoEditorCore.audioTrack = [];
+videoEditorCore.effectTrack = [];
 
-videoEditor.config = config;
-videoEditor.preview = preview;
-videoEditor.encoder = encoder;
-videoEditor.canvasEffects = canvasEffects;
+videoEditorCore.config = config;
+videoEditorCore.preview = preview;
+videoEditorCore.encoder = encoder;
+videoEditorCore.canvasEffects = canvasEffects;
 
-export default videoEditor;
+export default videoEditorCore;

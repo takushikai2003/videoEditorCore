@@ -1,5 +1,5 @@
 import Timer from "../timer.js";
-import videoEditor from "../videoEditorCore.js";
+import videoEditorCore from "../videoEditorCore.js";
 import config from "../config.js";
 import canvasEffects from "./canvasEffects.js";
 
@@ -7,6 +7,11 @@ const timer = new Timer();
 
 let canvas;
 let ctx;
+
+//動画処理用のcanvas（ユーザーからは見えない）
+const c_tmp = document.createElement("canvas");
+const ctx_tmp = c_tmp.getContext("2d",{willReadFrequently: true});
+
 
 //previwで使用（内部がshiftされていくので深いコピー必須）
 let videoTrackCopy, audioTrackCopy, effectTrackCopy;
@@ -17,9 +22,11 @@ let audioCtx, emptyNode, audioGain, videoAudioGain;
 let addedElements = [];//createMediaElementSource()に追加されたもの
 
 const preview = {
-    init: function(_canvas){
-        canvas = _canvas;
-        ctx = _canvas.getContext("2d");
+    init: function(){
+        canvas = config.preview.canvas;
+        ctx = canvas.getContext("2d");
+        c_tmp.width = config.preview.width;
+        c_tmp.height = config.preview.height;
     },
     nowTime: 0,//再生時の現在位置[s]
     length: 0,//プレビューの長さ[s]
@@ -38,9 +45,9 @@ const preview = {
         preview.nowTime = startTime;
 
         //トラックの深いコピー
-        videoTrackCopy = Array.from(videoEditor.videoTrack);
-        audioTrackCopy = Array.from(videoEditor.audioTrack);
-        effectTrackCopy = Array.from(videoEditor.effectTrack);
+        videoTrackCopy = Array.from(videoEditorCore.videoTrack);
+        audioTrackCopy = Array.from(videoEditorCore.audioTrack);
+        effectTrackCopy = Array.from(videoEditorCore.effectTrack);
 
         //previewLengthの値を決定
         let videoLength=0, effectLength=0, audioLength=0;
@@ -79,8 +86,8 @@ const preview = {
         // emptyNode.gain.value = 1;//全体の音量
         
         //MediaElementSourceの作成
-        for(let i=0; i<videoEditor.videoTrack.length; i++){
-            const element = videoEditor.videoTrack[i].element;
+        for(let i=0; i<videoEditorCore.videoTrack.length; i++){
+            const element = videoEditorCore.videoTrack[i].element;
             if(element.tagName == "IMG"){
                 continue;
             }
@@ -96,8 +103,8 @@ const preview = {
             addedElements.push(element);
         }
 
-        for(let i=0; i<videoEditor.audioTrack.length; i++){
-            const element = videoEditor.audioTrack[i].element;
+        for(let i=0; i<videoEditorCore.audioTrack.length; i++){
+            const element = videoEditorCore.audioTrack[i].element;
             
             if(addedElements.includes(element)){
                 continue;
@@ -199,12 +206,6 @@ const preview = {
 
 
 //------------------------------------------
-//動画処理用のcanvas（ユーザーからは見えない）
-const c_tmp = document.createElement("canvas");
-c_tmp.setAttribute("width", config.encode.width);
-c_tmp.setAttribute("height", config.encode.height);
-const ctx_tmp = c_tmp.getContext("2d",{willReadFrequently: true});
-
 async function computeFrame(videoTrack, audioTrack, effectTrack) {
     
     ctx_tmp.clearRect(0, 0, c_tmp.width, c_tmp.height);

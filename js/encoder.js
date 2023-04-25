@@ -1,4 +1,5 @@
-import videoEditor from "../videoEditorCore.js";
+import videoEditorCore from "../videoEditorCore.js";
+import config from "../config.js";
 
 let canvas;
 let ctx;
@@ -6,9 +7,9 @@ let ctx;
 const FPS = 25;
 
 const encoder = {
-    init: function(_canvas){
-        canvas = _canvas;
-        ctx = _canvas.getContext("2d");
+    init: function(){
+        canvas = config.encoder.canvas;
+        ctx = canvas.getContext("2d");
     },
     length: 0,
     frames: 0,
@@ -30,7 +31,7 @@ const encoder = {
 //----------------------------------------------------------------
 function encode(encodeType){
 
-    const preview = videoEditor.preview;
+    const preview = videoEditorCore.preview;
 
     encoder.status = "start";
     encoder.onStatusChange(encoder.status);
