@@ -4,6 +4,7 @@ import config from "../config.js";
 import canvasEffects from "./canvasEffects.js";
 
 const timer = new Timer();
+let LENA_GPU;
 
 let canvas;
 let ctx;
@@ -27,6 +28,7 @@ const preview = {
         ctx = canvas.getContext("2d");
         c_tmp.width = config.preview.width;
         c_tmp.height = config.preview.height;
+        LENA_GPU = new LenaGPU({width: config.preview.width, height: config.preview.height})
     },
     nowTime: 0,//再生時の現在位置[s]
     length: 0,//プレビューの長さ[s]
@@ -213,7 +215,7 @@ async function computeFrame(videoTrack, audioTrack, effectTrack) {
     await processVideoTrack(videoTrack);
 
     //frameに対して動画のエフェクトをかけられる
-    const imagedata = ctx_tmp.getImageData(0, 0, canvas.width, canvas.height);
+    let imagedata = ctx_tmp.getImageData(0, 0, canvas.width, canvas.height);
     
     switch(videoTrack[0].filter){
         case "monochrome":
@@ -225,6 +227,10 @@ async function computeFrame(videoTrack, audioTrack, effectTrack) {
         case "sepia":
             canvasEffects.sepia(imagedata.data);
             break;
+        case "gpu.sepia":
+            await LENA_GPU.sepia(c_tmp, c_tmp);
+            imagedata = ctx_tmp.getImageData(0, 0, canvas.width, canvas.height);
+            break;
         default:
             break;
     }
@@ -235,6 +241,7 @@ async function computeFrame(videoTrack, audioTrack, effectTrack) {
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.putImageData(imagedata, 0, 0);
+    // LENA_GPU.sepia(canvas, canvas);
 
     processEffectTrack(effectTrack);
     

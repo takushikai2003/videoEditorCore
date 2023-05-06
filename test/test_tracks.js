@@ -1,4 +1,5 @@
 import { VideoClip, AudioClip } from "./generateClip.js";
+import canvasEffects from "../js/canvasEffects.js";
 
 const videoElement = document.createElement("video");
 videoElement.src = "./media/720p.mp4";
@@ -14,9 +15,10 @@ export const videoTrack = [
     new VideoClip({
         element: videoElement,
         startTime: 0,
-        endTime: 5,
+        endTime: 10,
         relativeStartTime: 0,
         gain: 1,
+        filter: "gpu.sepia",
     }),
 ];
 

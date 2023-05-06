@@ -10,9 +10,14 @@ videoEditorCore.videoTrack = videoTrack;
 videoEditorCore.audioTrack = audioTrack;
 videoEditorCore.effectTrack = effectTrack;
 
-console.log(videoEditorCore);
-
+let startTime = 0;
 document.getElementById("btn")
 .addEventListener("click",()=>{
-    videoEditorCore.preview.play();
+    if(videoEditorCore.preview.playing){
+        //再生が停止した時間が返る
+        startTime = videoEditorCore.preview.pause();
+    }
+    else{
+        videoEditorCore.preview.play(startTime);
+    }
 });

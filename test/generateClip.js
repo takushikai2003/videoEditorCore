@@ -24,12 +24,14 @@ export class VideoClip extends Clip{
         relativeStartTime,
         relativeEndTime,
         gain,
+        filter
     }){
         super(startTime, endTime);
         this.element = element;
         this.relativeStartTime = relativeStartTime;
         this.relativeEndTime = relativeEndTime;
         this.gain = gain;
+        this.filter = filter;
     }
 }
 

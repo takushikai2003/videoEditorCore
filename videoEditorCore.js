@@ -14,6 +14,7 @@ function init(canvas){
 
     preview.init();
     encoder.init();
+    canvasEffects.init(config.preview.width, config.preview.height)
 }
 
 videoEditorCore.init = init;

@@ -2,12 +2,42 @@
 //引数、戻り値が、canvasやctxのときと、data(RGBA)のときがあるので注意
 //どれを取るかは、利用法を考えた上での最速を。
 
+const LENA_GPU = new LenaGPU({width: 10, height: 10});
+
 const canvasEffects = {
+    init(width, height){
+        LENA_GPU.width = width;
+        LENA_GPU.height = height;
+    },
     addText: addText,
     addImage: addImage,
     monochrome: monochrome,
     sepia: sepia,
     negativeInverte: negativeInverte,
+
+    // with lena-GPU
+    gpu: {
+        bigGaussian: LENA_GPU.bigGaussian,
+        blue       : LENA_GPU.blue,
+        flip       : LENA_GPU.flip,
+        gaussian   : LENA_GPU.gaussian,
+        grayscale  : LENA_GPU.grayscale,
+        green      : LENA_GPU.green,
+        highpass   : LENA_GPU.highpass,
+        invert     : LENA_GPU.invert,
+        laplacian  : LENA_GPU.laplacian,
+        lowpass3   : LENA_GPU.lowpass3,
+        lowpass5   : LENA_GPU.lowpass5,
+        mirror     : LENA_GPU.mirror,
+        prewittHorizontal: LENA_GPU.prewittHorizontal,
+        prewittVertical: LENA_GPU.prewittVertical,
+        red        : LENA_GPU.red,
+        roberts    : LENA_GPU.roberts,
+        sepia      : LENA_GPU.sepia,
+        sharpen    : LENA_GPU.sharpen,
+        sobelHorizontal: LENA_GPU.sobelHorizontal,
+        sobelVertical: LENA_GPU.sobelVertical
+    }
 }
 
 //canvasにテキストを追加
@@ -160,6 +190,7 @@ function sepia(data){
 }
 
 
+
 //ネガ反転
 function negativeInverte(data){
     for (var i = 0; i < data.length; i+=4) {
@@ -174,7 +205,7 @@ function negativeInverte(data){
 
 
 //TODO:
-//クロマキー合成（グリーンバッグ）
+//クロマキー合成（グリーンバック）
 
 
 

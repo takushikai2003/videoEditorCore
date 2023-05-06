@@ -1,0 +1,2 @@
+・GPU.js,lena-gpu.jsをmodule化
+・lena-gpu.jsのフィルタの引数、返り値をimagedataに
