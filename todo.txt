@@ -1,2 +1,8 @@
 ・GPU.js,lena-gpu.jsをmodule化
 ・lena-gpu.jsのフィルタの引数、返り値をimagedataに
+・レイヤー:
+videoTrack->videoTracks[]
+effectTrack.effect[]->effectTracks[].function
+
+・マスク
+・キーフレーム

@@ -1,5 +1,4 @@
 import { VideoClip, AudioClip } from "./generateClip.js";
-import canvasEffects from "../js/canvasEffects.js";
 
 const videoElement = document.createElement("video");
 videoElement.src = "./media/720p.mp4";
