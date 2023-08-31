@@ -41,14 +41,18 @@ const canvasEffects = {
 }
 
 //canvasにテキストを追加
-//TODO: rotate 改行対応
-function addText({canvas,text,config}){
+//TODO: 改行対応
+// fontsize:autoやunderなどの複雑な処理はUIに任せるか？
+// (↑単純に中心なら良いが、そこから少しずらすなどするならプロパティが増える)
+function addText(config){
+    let canvas = config.canvas;
+    const text = config.text;
     if(canvas == undefined){
         canvas = document.getElementById("main_canvas");
     }
     const ctx = canvas.getContext("2d");
 
-    config.size = config.size;//str
+    // config.size = config.size;//str
     config.font = config.font || "Arial";
     config.color = config.color || "#000000";
     config.bold = (config.bold==true)?"bold":"";
@@ -58,94 +62,110 @@ function addText({canvas,text,config}){
     config.underLine = config.underLine || false;
     config.backgroundColor = config.backgroundColor || false;
 
-    let ctxFontEdited = false; //ctx.fontを編集したかのフラグ
+    let size;
+
 
     if(config.size == "auto"){
-        console.log("size: auto");
-        //まず20ptで試してみる
-        config.size = "20pt";
-
+        
         //はじめのフォント(pt)
-        let size = 30;
-        let flg = false;
-        while(flg == false){
-            ctx.font = config.italic+" "+config.bold+" "+config.size+" "+config.font;
-            ctxFontEdited = true;
+        let font_size = 100;
+        //textがcanvas幅いっぱいになると見にくいので、canvas幅の2/3をMAXに
+        const textWidthMAX = canvas.width*2/3;
 
-            let textWidth = ctx.measureText(text).width;
-            //textがcanvas幅いっぱいになると見にくいので、canvas幅の2/3をMAXに
-            const textWidthMAX = canvas.width*2/3;
+        const _bold = (config.bold==true)?"bold":"";
+        const _italic = (config.italic==true)?"italic":"";
+
+        while(true){
+            ctx.font = _italic+" "+_bold+" "+font_size+"pt"+" "+config.font;
+            // ctxFontEdited = true;
+
+            const textWidth = ctx.measureText(text).width;
+
             if(textWidth <= textWidthMAX){
-                flg = true;
-                console.log("size: "+size+"pt");
+                // console.log("size: "+font_size+"pt");
+                break;
             }
             else{
                 //sizeを1ptずつ小さくしながら比較していく
-                size--;
-                config.size = size + "pt";
+                font_size--;
             }
         }
 
+        size = font_size + "pt";
+
     }
 
-    if(config.positionX == "center"){
-        console.log("positionX: center");
-
-        if(ctxFontEdited == false){
-            ctx.font = config.italic+" "+config.bold+" "+config.size+" "+config.font;
-        }
-
-        const textWidth = ctx.measureText(text).width;
-        config.positionX = (canvas.width - textWidth)/2;
+    else{
+        size = config.size + "pt";
     }
 
-    if(config.positionY == "under"){
-        console.log("positionY: under");
+    const textWidth = ctx.measureText(text).width;
+    const mesure = ctx.measureText(text);
+    const textHeight = mesure.actualBoundingBoxAscent + mesure.actualBoundingBoxDescent;
 
-        const mesure = ctx.measureText(text);
-        const textHeight = mesure.actualBoundingBoxAscent + mesure.actualBoundingBoxDescent;
+    let positionX = config.positionX;
+    let positionY = config.positionY;
 
-        config.positionY = canvas.height - textHeight - 30;// -30で下からちょっと上へ
+    if(config.positionX == "left"){
+        positionX = 0;
+    }
+    else if(config.positionX == "center"){
+        positionX = (canvas.width - textWidth)/2;
+    }
+    else if(config.positionX == "right"){
+        positionX = canvas.width - textWidth;
     }
 
-    //アンダーライン
-    if(config.underLine != false){
-        console.log("underLine");
-
-        const mesure = ctx.measureText(text);
-        const textWidth = mesure.width;
-        const textHeight = mesure.actualBoundingBoxAscent + mesure.actualBoundingBoxDescent;
-
-        ctx.beginPath();
-        ctx.moveTo(config.positionX, config.positionY + textHeight);
-        ctx.lineTo(config.positionX + textWidth, config.positionY + textHeight);
-        ctx.strokeStyle = config.underLine;
-        ctx.stroke();
+    if(config.positionY == "above"){
+        positionY = textHeight*1.5;
     }
+    else if(config.positionY == "center"){
+        positionY = (canvas.height/2) + (textHeight/2);
+    }
+    else if(config.positionY == "under"){
+        positionY = canvas.height; // - 30;// -30で下からちょっと上へ
+    }
+
+    // 回転の中心位置を計算（画像の中心を回転中心にする）
+    const cx = positionX + textWidth/2;
+    const cy = positionY + textHeight/2;
+    const rad = config.rotate/180*Math.PI
+    // 画像を回転
+    ctx.setTransform(Math.cos(rad), Math.sin(rad), -Math.sin(rad), Math.cos(rad),cx-cx*Math.cos(rad)+cy*Math.sin(rad),cy-cx*Math.sin(rad)-cy*Math.cos(rad));
 
     //背景色
     if(config.backgroundColor != false){
-        // let txw2 = ctx.measureText(text);
-
         const mesure = ctx.measureText(text);
         const textWidth = mesure.width;
         const textHeight = mesure.actualBoundingBoxAscent + mesure.actualBoundingBoxDescent;
 
         //ピッタリすぎるので5px広く
         ctx.fillStyle = config.backgroundColor;
-        ctx.fillRect(config.positionX - 5, config.positionY - 5, textWidth + 10, textHeight + 10);
+        ctx.fillRect(positionX - 5, positionY - 5, textWidth + 10, textHeight + 10);
     }
 
+    //アンダーライン
+    if(config.underLine != false){
 
-    ctx.font = config.italic+" "+config.bold+" "+config.size+" "+config.font;
-    ctxFontEdited = true;
+        const mesure = ctx.measureText(text);
+        const textWidth = mesure.width;
+        const textHeight = mesure.actualBoundingBoxAscent + mesure.actualBoundingBoxDescent;
+
+        ctx.beginPath();
+        ctx.moveTo(positionX, positionY + textHeight);
+        ctx.lineTo(positionX + textWidth, positionY + textHeight);
+        ctx.strokeStyle = config.underLine;
+        ctx.stroke();
+    }
+
+    ctx.font = config.italic+" "+config.bold+" "+size+" "+config.font;
     ctx.textAlign = "start";
     ctx.textBaseline = "top";
 
     ctx.fillStyle = config.color;
-    ctx.fillText(text, config.positionX, config.positionY);
+    ctx.fillText(text, positionX, positionY);
+    ctx.restore();
 }
-
 
 
 function addImage({canvas,image,config}){

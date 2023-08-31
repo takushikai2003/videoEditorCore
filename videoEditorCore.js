@@ -22,6 +22,7 @@ videoEditorCore.init = init;
 videoEditorCore.videoTrack = [];
 videoEditorCore.audioTrack = [];
 videoEditorCore.effectTrack = [];
+videoEditorCore.keyframeEffectTrack = [];
 
 videoEditorCore.config = config;
 videoEditorCore.preview = preview;

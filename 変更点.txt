@@ -1,0 +1,12 @@
+KeyframeEffectTrackの追加
+
+KeyframeEffect[]
+    -keyframes[]
+        -keyframe
+            -startTime　※全体時間
+            (-type: linear,stop)
+            -function
+            -staticArguments
+            -dynamicArguments
+    -startTime
+    -endTime

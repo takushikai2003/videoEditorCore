@@ -1,4 +1,5 @@
-import { VideoClip, AudioClip } from "./generateClip.js";
+import { VideoClip, AudioClip, EffectClip, Effect, Keyframe, KeyframeEffect } from "./generateClip.js";
+import canvasEffects from "../js/canvasEffects.js";
 
 const videoElement = document.createElement("video");
 videoElement.src = "./media/720p.mp4";
@@ -23,8 +24,35 @@ export const videoTrack = [
 
 export const audioTrack = [];
 
-export const effectTrack = [];
+export const effectTrack = [
+    // new EffectClip({
+    //     startTime:0,
+    //     endTime:10,
+    //     effects:[
+    //         new Effect(
+    //             canvasEffects.addText,
+    //             {
+    //                 text: "あああ",
+    //                 size:10,
+    //                 positionY:"center",
+    //                 backgroundColor:"red",
+    //                 underLine: "blue",
+    //                 rotate: 100
+    //             }
+    //         )
+    //     ]
+    // })
+];
 
+const keyframes = [
+    new Keyframe(0, canvasEffects.addText, {size:0, positionX:0}, {text: "あああ", positionY:"center",rotate: 0}),
+    new Keyframe(3, canvasEffects.addText, {size:100, positionX:50}, {text: "あああ", positionY:"center",rotate: 0}),
+    new Keyframe(10, canvasEffects.addText, {size:0, positionX:100}, {text: "あああ", positionY:"center",rotate: 0}),
+];
+
+export const keyframeEffectTrack = [
+    new KeyframeEffect(keyframes, 0, 10)
+];
 
 function waitEvent(element, eventType){
     return new Promise(resolve=>{

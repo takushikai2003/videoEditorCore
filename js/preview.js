@@ -15,7 +15,7 @@ const ctx_tmp = c_tmp.getContext("2d",{willReadFrequently: true});
 
 
 //previwで使用（内部がshiftされていくので深いコピー必須）
-let videoTrackCopy, audioTrackCopy, effectTrackCopy;
+let videoTrackCopy, audioTrackCopy, effectTrackCopy, keyframeEffectTrackCopy;
 
 let audioCtx, emptyNode, audioGain, videoAudioGain;
 // let soundDestinationConnected = false;
@@ -47,12 +47,13 @@ const preview = {
         preview.nowTime = startTime;
 
         //トラックの深いコピー
-        videoTrackCopy = Array.from(videoEditorCore.videoTrack);
-        audioTrackCopy = Array.from(videoEditorCore.audioTrack);
-        effectTrackCopy = Array.from(videoEditorCore.effectTrack);
+        videoTrackCopy = videoEditorCore.videoTrack.map(list=>({...list}));
+        audioTrackCopy = videoEditorCore.audioTrack.map(list=>({...list}));
+        effectTrackCopy = videoEditorCore.effectTrack.map(list=>({...list}));
+        keyframeEffectTrackCopy = videoEditorCore.keyframeEffectTrack.map(list=>({...list}));
 
         //previewLengthの値を決定
-        let videoLength=0, effectLength=0, audioLength=0;
+        let videoLength=0, effectLength=0, audioLength=0, keyframeEffectLength=0;
 
         if(videoTrackCopy.length != 0){
             videoLength = videoTrackCopy[videoTrackCopy.length - 1].endTime;
@@ -63,8 +64,11 @@ const preview = {
         if(audioTrackCopy.length != 0){
             audioLength = audioTrackCopy[audioTrackCopy.length - 1].endTime;
         }
+        if(keyframeEffectTrackCopy.length != 0){
+            keyframeEffectLength = keyframeEffectTrackCopy[keyframeEffectTrackCopy.length - 1].endTime;
+        }
         
-        preview.length = Math.max(videoLength, effectLength, audioLength);
+        preview.length = Math.max(videoLength, effectLength, audioLength, keyframeEffectLength);
 
         //途中から再生するために、endTime未満のクリップは破棄
         videoTrackCopy = videoTrackCopy.filter(clip => {
@@ -135,11 +139,14 @@ const preview = {
         }
 
 
+        // キーフレームをコンパイル
+        compileKeyframeEffectTrack(keyframeEffectTrackCopy);
+
         //seekならcomputeFrameは一度だけ
         if(seek){
             preview.seeking = true;
             
-            await computeFrame(videoTrackCopy, audioTrackCopy, effectTrackCopy);
+            await computeFrame(videoTrackCopy, audioTrackCopy, effectTrackCopy, keyframeEffectTrackCopy);
             preview.pause();
             console.log("preview seeked");
             preview.seeking = false;
@@ -157,6 +164,7 @@ const preview = {
 
             //全ての再生が終了したら
             if(preview.nowTime > preview.length){
+                preview.nowTime = 0;
                 preview.pause();
                 preview.onEnd();
 
@@ -165,7 +173,7 @@ const preview = {
                 return;
             }
 
-            await computeFrame(videoTrackCopy, audioTrackCopy, effectTrackCopy);
+            await computeFrame(videoTrackCopy, audioTrackCopy, effectTrackCopy, keyframeEffectTrackCopy);
             preview.onTimeUpdate();
         }
         
@@ -208,7 +216,7 @@ const preview = {
 
 
 //------------------------------------------
-async function computeFrame(videoTrack, audioTrack, effectTrack) {
+async function computeFrame(videoTrack, audioTrack, effectTrack, keyframeEffectTrack) {
     
     ctx_tmp.clearRect(0, 0, c_tmp.width, c_tmp.height);
 
@@ -217,24 +225,26 @@ async function computeFrame(videoTrack, audioTrack, effectTrack) {
     //frameに対して動画のエフェクトをかけられる
     let imagedata = ctx_tmp.getImageData(0, 0, canvas.width, canvas.height);
     
-    switch(videoTrack[0].filter){
-        case "monochrome":
-            canvasEffects.monochrome(imagedata.data);
-            break;
-        case "negativeInverte":
-            canvasEffects.negativeInverte(imagedata.data);
-            break;
-        case "sepia":
-            canvasEffects.sepia(imagedata.data);
-            break;
-        case "gpu.sepia":
-            await LENA_GPU.sepia(c_tmp, c_tmp);
-            imagedata = ctx_tmp.getImageData(0, 0, canvas.width, canvas.height);
-            break;
-        default:
-            break;
+    if(videoTrack.length != 0){
+        switch(videoTrack[0].filter){
+            case "monochrome":
+                canvasEffects.monochrome(imagedata.data);
+                break;
+            case "negativeInverte":
+                canvasEffects.negativeInverte(imagedata.data);
+                break;
+            case "sepia":
+                canvasEffects.sepia(imagedata.data);
+                break;
+            case "gpu.sepia":
+                await LENA_GPU.sepia(c_tmp, c_tmp);
+                imagedata = ctx_tmp.getImageData(0, 0, canvas.width, canvas.height);
+                break;
+            default:
+                break;
+        }    
     }
-
+    
 
     await processAudioTrack(audioTrack);
 
@@ -244,6 +254,7 @@ async function computeFrame(videoTrack, audioTrack, effectTrack) {
     // LENA_GPU.sepia(canvas, canvas);
 
     processEffectTrack(effectTrack);
+    processKeyframeEffectTrack(keyframeEffectTrack)
     
     // await wait(1);//chromeバグ対策
 }
@@ -386,6 +397,79 @@ function processEffectTrack(effectTrack){
         for(let i=0; i<effectTrack[0].effect.length; i++){//内部のeffectの長さ分
             effectTrack[0].effect[i].function(effectTrack[0].effect[i].arguments);
         }
+    }
+
+}
+
+
+// 再生前に一度だけ、各keyframeの数式係数を決定する
+// (とりあえずlinearのみ)
+function compileKeyframeEffectTrack(keyframeEffectTrack){
+
+    for(let i=0; i<keyframeEffectTrack.length; i++){
+        for(let j=0; j<keyframeEffectTrack[i].keyframes.length; j++){
+            const keyframe = keyframeEffectTrack[i].keyframes[j];
+            const nextKeyframe = keyframeEffectTrack[i].keyframes[j+1];
+
+            if(nextKeyframe == undefined){
+                break;
+            }
+
+            // 係数保存用
+            keyframe.coefficients = [];//{key,a,b}
+            // linear
+            // f(t) = at + b の係数a,bを決定する
+            Object.entries(keyframe.dynamicArguments)
+            .forEach(arr=>{
+                const key = arr[0];
+                const value = arr[1];
+                const a = (nextKeyframe.dynamicArguments[key] - value) / (nextKeyframe.startTime - keyframe.startTime);
+                const b = value - (a * keyframe.startTime);
+                keyframe.coefficients.push({key: key, a: a, b: b});
+            });
+           
+        }
+    }
+    
+}
+
+
+function processKeyframeEffectTrack(keyframeEffectTrack){
+
+    if(keyframeEffectTrack[0]!=undefined && preview.nowTime > keyframeEffectTrack[0].endTime){ //endTimeを超えていたら
+        keyframeEffectTrack.shift();//次のKeyframeEffectへ
+    }
+
+    if(keyframeEffectTrack[0]==undefined){
+        return;
+    }
+
+    // 次の要素のstartTimeがnowTimeを超えていたらそれより前の要素を削除する
+    for(let i=0; i<keyframeEffectTrack[0].keyframes.length; i++){
+        const keyframe = keyframeEffectTrack[0].keyframes[i];
+        
+        if(keyframe.startTime >= preview.nowTime){
+            keyframeEffectTrack[0].keyframes = keyframeEffectTrack[0].keyframes.slice(i-1);
+            break;
+        }
+    }
+
+    //startTime以上なら、キーフレームの実行を開始する
+    if(preview.nowTime >= keyframeEffectTrack[0].keyframes[0].startTime){
+        const keyframe = keyframeEffectTrack[0].keyframes[0];
+        const args = {};
+        // 動的引数の値を計算して決定する
+        keyframe.coefficients.forEach(obj=>{
+            // f(t) = at + b
+            args[obj.key] = obj.a * preview.nowTime + obj.b;
+        });
+
+        // 静的引数を結合
+        Object.assign(args, keyframe.staticArguments);
+
+        //描画処理へ
+        keyframeEffectTrack[0].keyframes[0].function(args);
+        
     }
 
 }

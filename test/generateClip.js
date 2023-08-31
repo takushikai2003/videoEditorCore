@@ -54,12 +54,40 @@ export class AudioClip extends Clip{
 }
 
 
-// export class EffectClip extends Clip{
-//     constructor({
-//         fn,
-//         startTime,
-//         endTime
-//     }){
-//         super(startTime, endTime);
-//     }
-// }
+export class EffectClip extends Clip{
+    constructor({
+        startTime,
+        endTime,
+        effects,
+    }){
+        super(startTime, endTime);
+        this.effect = effects;
+    }
+}
+
+
+export class Effect{
+    constructor(_function, _arguments){
+        this.function = _function,
+        this.arguments = _arguments
+    }
+}
+
+
+export class Keyframe{
+    constructor(startTime, _function, dynamicArguments, staticArguments){
+        this.function = _function;
+        this.startTime = startTime;
+        this.staticArguments = staticArguments;
+        this.dynamicArguments = dynamicArguments;
+    }
+}
+
+
+export class KeyframeEffect{
+    constructor(keyframes, startTime, endTime){
+        this.keyframes = keyframes;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+}
