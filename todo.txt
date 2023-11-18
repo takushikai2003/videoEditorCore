@@ -6,3 +6,4 @@ effectTrack.effect[]->effectTracks[].function
 
 ・マスク
 ・キーフレーム
+・動画書き出しはVideoEditorEncoderに変更する
