@@ -33,11 +33,12 @@ export const effectTrack = [
                 canvasEffects.addText,
                 {
                     text: "あああ",
-                    size: 10,
+                    size: 100,
+                    positionX:"center",
                     positionY:"center",
                     backgroundColor:"red",
                     underLine: "blue",
-                    rotate: 100
+                    rotate: 30
                 }
             )
         ]

@@ -99,6 +99,11 @@ function addText(config){
         size = config.size + "pt";
     }
 
+    ctx.save();
+    ctx.font = config.italic+" "+config.bold+" "+size+" "+config.font;
+    ctx.textAlign = "start";
+    ctx.textBaseline = "top";
+
     const textWidth = ctx.measureText(text).width;
     const mesure = ctx.measureText(text);
     const textHeight = mesure.actualBoundingBoxAscent + mesure.actualBoundingBoxDescent;
@@ -125,8 +130,6 @@ function addText(config){
     else if(config.positionY == "under"){
         positionY = canvas.height; // - 30;// -30で下からちょっと上へ
     }
-
-    ctx.save();
 
     // 回転の中心位置を計算（画像の中心を回転中心にする）
     const cx = positionX + textWidth/2;
@@ -159,10 +162,6 @@ function addText(config){
         ctx.strokeStyle = config.underLine;
         ctx.stroke();
     }
-
-    ctx.font = config.italic+" "+config.bold+" "+size+" "+config.font;
-    ctx.textAlign = "start";
-    ctx.textBaseline = "top";
 
     ctx.fillStyle = config.color;
     ctx.fillText(text, positionX, positionY);
