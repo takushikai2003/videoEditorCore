@@ -25,23 +25,23 @@ export const videoTrack = [
 export const audioTrack = [];
 
 export const effectTrack = [
-    // new EffectClip({
-    //     startTime:0,
-    //     endTime:10,
-    //     effects:[
-    //         new Effect(
-    //             canvasEffects.addText,
-    //             {
-    //                 text: "あああ",
-    //                 size:10,
-    //                 positionY:"center",
-    //                 backgroundColor:"red",
-    //                 underLine: "blue",
-    //                 rotate: 100
-    //             }
-    //         )
-    //     ]
-    // })
+    new EffectClip({
+        startTime:0,
+        endTime:10,
+        effects:[
+            new Effect(
+                canvasEffects.addText,
+                {
+                    text: "あああ",
+                    size: 10,
+                    positionY:"center",
+                    backgroundColor:"red",
+                    underLine: "blue",
+                    rotate: 100
+                }
+            )
+        ]
+    })
 ];
 
 const keyframes = [

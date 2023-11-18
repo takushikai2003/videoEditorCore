@@ -126,6 +126,8 @@ function addText(config){
         positionY = canvas.height; // - 30;// -30で下からちょっと上へ
     }
 
+    ctx.save();
+
     // 回転の中心位置を計算（画像の中心を回転中心にする）
     const cx = positionX + textWidth/2;
     const cy = positionY + textHeight/2;

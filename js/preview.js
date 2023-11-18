@@ -440,6 +440,7 @@ function processKeyframeEffectTrack(keyframeEffectTrack){
         keyframeEffectTrack.shift();//次のKeyframeEffectへ
     }
 
+    // .length==0じゃだめ？
     if(keyframeEffectTrack[0]==undefined){
         return;
     }
