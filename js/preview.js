@@ -40,6 +40,34 @@ const preview = {
     onEnd: function(){},
     onAudioStreamAvailable: function(){},
     seeking: false,
+
+    // previewの長さを計算してpreview.lengthにセットする
+    calcLength: function(){
+        const videoTrack = videoEditorCore.videoTrack;
+        const audioTrack = videoEditorCore.audioTrack;
+        const effectTrack = videoEditorCore.effectTrack;
+        const keyframeEffectTrack = videoEditorCore.keyframeEffectTrack;
+
+        //previewLengthの値を決定
+        let videoLength=0, effectLength=0, audioLength=0, keyframeEffectLength=0;
+
+        if(videoTrack.length != 0){
+            videoLength = videoTrack[videoTrack.length - 1].endTime;
+        }
+        if(effectTrack.length != 0){
+            effectLength = effectTrack[effectTrack.length - 1].endTime;
+        }
+        if(audioTrack.length != 0){
+            audioLength = audioTrack[audioTrack.length - 1].endTime;
+        }
+        if(keyframeEffectTrack.length != 0){
+            keyframeEffectLength = keyframeEffectTrack[keyframeEffectTrack.length - 1].endTime;
+        }
+
+        preview.length = Math.max(videoLength, effectLength, audioLength, keyframeEffectLength);
+
+        return preview.length;
+    },
     
     //arg: startTime：途中から再生[秒]
     play: async function(startTime = 0, encode=false, seek=false){
@@ -52,23 +80,7 @@ const preview = {
         effectTrackCopy = videoEditorCore.effectTrack.map(list=>({...list}));
         keyframeEffectTrackCopy = videoEditorCore.keyframeEffectTrack.map(list=>({...list}));
 
-        //previewLengthの値を決定
-        let videoLength=0, effectLength=0, audioLength=0, keyframeEffectLength=0;
-
-        if(videoTrackCopy.length != 0){
-            videoLength = videoTrackCopy[videoTrackCopy.length - 1].endTime;
-        }
-        if(effectTrackCopy.length != 0){
-            effectLength = effectTrackCopy[effectTrackCopy.length - 1].endTime;
-        }
-        if(audioTrackCopy.length != 0){
-            audioLength = audioTrackCopy[audioTrackCopy.length - 1].endTime;
-        }
-        if(keyframeEffectTrackCopy.length != 0){
-            keyframeEffectLength = keyframeEffectTrackCopy[keyframeEffectTrackCopy.length - 1].endTime;
-        }
-        
-        preview.length = Math.max(videoLength, effectLength, audioLength, keyframeEffectLength);
+        preview.calcLength();
 
         //途中から再生するために、endTime未満のクリップは破棄
         videoTrackCopy = videoTrackCopy.filter(clip => {

@@ -28,4 +28,24 @@ videoEditorCore.preview = preview;
 videoEditorCore.encoder = encoder;
 videoEditorCore.canvasEffects = canvasEffects;
 
+
+// 外部でTrackの値を変更するときは、この関数の使用を推奨
+videoEditorCore.setVideoTrack = function(videoTrack){
+    videoEditorCore.videoTrack = videoTrack;
+    videoEditorCore.preview.calcLength();
+}
+videoEditorCore.setAudioTrack = function(audioTrack){
+    videoEditorCore.audioTrack = audioTrack;
+    videoEditorCore.preview.calcLength();
+}
+videoEditorCore.setEffectTrack = function(effectTrack){
+    videoEditorCore.effectTrack = effectTrack;
+    videoEditorCore.preview.calcLength();
+}
+videoEditorCore.setKeyframeEffectTrack = function(keyframeEffectTrack){
+    videoEditorCore.keyframeEffectTrack = keyframeEffectTrack;
+    videoEditorCore.preview.calcLength();
+}
+
+
 export default videoEditorCore;

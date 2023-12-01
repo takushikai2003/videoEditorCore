@@ -5,5 +5,4 @@ videoTrack->videoTracks[]
 effectTrack.effect[]->effectTracks[].function
 
 ・マスク
-・キーフレーム
-・動画書き出しはVideoEditorEncoderに変更する
+・キーフレームの補間関数増やす

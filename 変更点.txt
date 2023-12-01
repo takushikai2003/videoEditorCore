@@ -20,3 +20,7 @@ Clip.overallStartTime→Clip.startTime
 Clip.overallEndTime→Clip.endTime
 Clip.internalStartTime→Clip.relativeStartTime
 Clip.internalEndTime→Clip.relativeEndTime
+
+videoEditorCore.videoTrackなどは、外部からの値変更は推奨されない（読み取りはOK）
+値を変更したい時は、videoEditorCore.setVideoTrack(videoTrack)を使用すること。
+（直接代入しても通常は動くが、再生せずにエンコーダを起動すると、videoEditorCore.preview.lengthが0となりエラーになる）

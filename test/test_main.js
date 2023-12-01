@@ -6,10 +6,10 @@ canvas.width = 400;
 canvas.height = 300;
 
 videoEditorCore.init(canvas);
-videoEditorCore.videoTrack = videoTrack;
-videoEditorCore.audioTrack = audioTrack;
-videoEditorCore.effectTrack = effectTrack;
-videoEditorCore.keyframeEffectTrack = keyframeEffectTrack;
+videoEditorCore.setVideoTrack(videoTrack);
+videoEditorCore.setAudioTrack(audioTrack);
+videoEditorCore.setEffectTrack(effectTrack);
+videoEditorCore.setKeyframeEffectTrack(keyframeEffectTrack);
 
 // 再生
 let startTime = 0;
