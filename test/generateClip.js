@@ -1,32 +1,37 @@
 class Clip {
-    constructor(startTime, endTime) {
-        this.id = Clip.nextId();
+    constructor(startTime, endTime, mediaId) {
+        // this.id = Clip.nextId();
         this.startTime = startTime;
         this.endTime = endTime;
+        this.mediaId = mediaId;
     }
 
-    static nextId() {
-        if (!this.latestId) {
-            this.latestId = 1;
-        } else {
-            this.latestId++;
-        }
-        return this.latestId;
-    }
+    
+    // このidは、将来的にクリップのidが必要になった時用。
+    // メディアのid（"v0"など）とは異なる
+    // static nextId() {
+    //     if (!this.latestId) {
+    //         this.latestId = 1;
+    //     } else {
+    //         this.latestId++;
+    //     }
+    //     return this.latestId;
+    // }
 }
 
 
 export class VideoClip extends Clip{
     constructor({
+        mediaId,
         element,
         startTime,
         endTime,
         relativeStartTime,
         relativeEndTime,
         gain,
-        filter
+        filter,
     }){
-        super(startTime, endTime);
+        super(startTime, endTime, mediaId);
         this.element = element;
         this.relativeStartTime = relativeStartTime;
         this.relativeEndTime = relativeEndTime;
@@ -38,6 +43,7 @@ export class VideoClip extends Clip{
 
 export class AudioClip extends Clip{
     constructor({
+        mediaId,
         element,
         startTime,
         endTime,
@@ -45,7 +51,7 @@ export class AudioClip extends Clip{
         relativeEndTime,
         gain,
     }){
-        super(startTime, endTime);
+        super(startTime, endTime, mediaId);
         this.element = element;
         this.relativeStartTime = relativeStartTime;
         this.relativeEndTime = relativeEndTime;

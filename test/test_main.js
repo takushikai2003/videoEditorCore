@@ -11,8 +11,9 @@ videoEditorCore.audioTrack = audioTrack;
 videoEditorCore.effectTrack = effectTrack;
 videoEditorCore.keyframeEffectTrack = keyframeEffectTrack;
 
+// 再生
 let startTime = 0;
-document.getElementById("btn")
+document.getElementById("play")
 .addEventListener("click",()=>{
     if(videoEditorCore.preview.playing){
         //再生が停止した時間が返る
@@ -21,4 +22,11 @@ document.getElementById("btn")
     else{
         videoEditorCore.preview.play(startTime);
     }
+});
+
+
+// 書き出し
+document.getElementById("encode")
+.addEventListener("click",()=>{
+    videoEditorCore.encoder.encode();
 });

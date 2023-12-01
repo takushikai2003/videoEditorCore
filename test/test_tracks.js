@@ -1,28 +1,44 @@
 import { VideoClip, AudioClip, EffectClip, Effect, Keyframe, KeyframeEffect } from "./generateClip.js";
+import { genAudioBuffer } from "./genAudioBuffer.js";
 import canvasEffects from "../js/canvasEffects.js";
 
 const videoElement = document.createElement("video");
 videoElement.src = "./media/720p.mp4";
 await waitEvent(videoElement, "loadeddata");
+videos["v0"] = {audioBuffer: await genAudioBuffer("./media/720p.mp4")};
+
 const imageElement = document.createElement("img");
 imageElement.src = "./media/mountain.jpg";
-await waitEvent(imageElement, "load");
+
 const audioElement = document.createElement("audio");
 audioElement.src = "./media/HighwayStar.mp3";
 await waitEvent(audioElement, "loadeddata");
+await waitEvent(imageElement, "load");
+audios["a0"] = {audioBuffer: await genAudioBuffer("./media/HighwayStar.mp3")}
+
 
 export const videoTrack = [
     new VideoClip({
+        mediaId: "v0",
         element: videoElement,
         startTime: 0,
         endTime: 10,
         relativeStartTime: 0,
-        gain: 1,
+        gain: 0.1,
         filter: "gpu.sepia",
     }),
 ];
 
-export const audioTrack = [];
+export const audioTrack = [
+    new AudioClip({
+        mediaId: "a0",
+        element: audioElement,
+        startTime: 0,
+        endTime: 5,
+        relativeStartTime: 0,
+        gain: 1,
+    }),
+];
 
 export const effectTrack = [
     new EffectClip({
@@ -54,6 +70,7 @@ const keyframes = [
 export const keyframeEffectTrack = [
     new KeyframeEffect(keyframes, 0, 10)
 ];
+
 
 function waitEvent(element, eventType){
     return new Promise(resolve=>{
