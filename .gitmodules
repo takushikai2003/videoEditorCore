@@ -1,0 +1,3 @@
+[submodule "videoEditorEncoder"]
+	path = videoEditorEncoder
+	url = https://github.com/takushikai2003/videoEditorEncoder
