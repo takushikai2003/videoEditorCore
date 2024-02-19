@@ -52,13 +52,13 @@ readonly keyframeEffectTrack
 ### メソッド
 ```ts
 void setVideoTrack(videoTrack)
-```
 
 //シーク
 videoEditorCore.preview.seekTo(time);//time:ジャンプする時間[秒]
 
 //書き出し
 videoEditorCore.encoder.encode();//ダウンロードまで行われる
+```
 
 【5.必要に応じて、都度videoTrack,audioTrack,effectTrackをセットする】
 3.と同様。
