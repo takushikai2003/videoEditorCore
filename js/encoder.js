@@ -11,7 +11,7 @@ const encoder = {
     frames: 0,
     progress: 0,
 
-    status: "none", //none,start,finished
+    status: "none", //none,start,finished,error
     onStatusChange: function(){},
     onProgress: function(){},
 
@@ -71,6 +71,8 @@ async function encode(){
         console.log(`encoding finished in ${(performance.now() - encodingStartTime)/1000}s`);
     })
     .catch(e=>{
+        encoder.status = "error";
+        encoder.onStatusChange(encoder.status);
         console.error(e);
         alert(e);
     });
