@@ -3,7 +3,7 @@ import { genAudioBuffer } from "./genAudioBuffer.js";
 import canvasEffects from "../js/canvasEffects.js";
 
 const videoElement = document.createElement("video");
-videoElement.src = "./media/720p.mp4";
+videoElement.src = "./media/ABCDE.mp4";
 await waitEvent(videoElement, "loadeddata");
 videos["v0"] = {audioBuffer: await genAudioBuffer("./media/720p.mp4")};
 
@@ -21,44 +21,44 @@ export const videoTrack = [
     new VideoClip({
         mediaId: "v0",
         element: videoElement,
-        startTime: 0,
-        endTime: 10,
+        startTime: 0.0,
+        endTime: 4.1,
         relativeStartTime: 0,
-        gain: 0.1,
-        filter: "gpu.sepia",
+        gain: 1,
+        // filter: "gpu.sepia",
     }),
 ];
 
 export const audioTrack = [
-    new AudioClip({
-        mediaId: "a0",
-        element: audioElement,
-        startTime: 0,
-        endTime: 5,
-        relativeStartTime: 0,
-        gain: 1,
-    }),
+    // new AudioClip({
+    //     mediaId: "a0",
+    //     element: audioElement,
+    //     startTime: 0,
+    //     endTime: 5,
+    //     relativeStartTime: 0,
+    //     gain: 1,
+    // }),
 ];
 
 export const effectTrack = [
-    new EffectClip({
-        startTime:0,
-        endTime:10,
-        effects:[
-            new Effect(
-                canvasEffects.addText,
-                {
-                    text: "あああ",
-                    size: 100,
-                    positionX:"center",
-                    positionY:"center",
-                    backgroundColor:"red",
-                    underLine: "blue",
-                    rotate: 30
-                }
-            )
-        ]
-    })
+    // new EffectClip({
+    //     startTime:0,
+    //     endTime:10,
+    //     effects:[
+    //         new Effect(
+    //             canvasEffects.addText,
+    //             {
+    //                 text: "あああ",
+    //                 size: 100,
+    //                 positionX:"center",
+    //                 positionY:"center",
+    //                 backgroundColor:"red",
+    //                 underLine: "blue",
+    //                 rotate: 30
+    //             }
+    //         )
+    //     ]
+    // })
 ];
 
 const keyframes = [
@@ -68,7 +68,7 @@ const keyframes = [
 ];
 
 export const keyframeEffectTrack = [
-    new KeyframeEffect(keyframes, 0, 10)
+    // new KeyframeEffect(keyframes, 0, 10)
 ];
 
 

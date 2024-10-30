@@ -215,12 +215,16 @@ const preview = {
     },
 
 
-    seekTo: async function(startTime){
+    seekTo: async function(startTime, encode=false){
         if(preview.seeking){
             return;
         }
 
-        await preview.play(startTime, false, true);
+        await preview.play(startTime, encode, true);
+
+        if(!encode){
+            console.log("preview seeked");
+        }
 
         return;
     }
@@ -280,6 +284,8 @@ async function computeFrame(videoTrack, audioTrack, effectTrack, keyframeEffectT
 //per frame
 async function processVideoTrack(videoTrack){
 
+    console.log(videoTrack);
+    
     let misalignment; //本来の位置とのずれ[s]
 
     if(videoTrack[0]!=undefined &&
@@ -307,7 +313,14 @@ async function processVideoTrack(videoTrack){
         videoTrack[0].element.paused == false &&
         misalignment > preview.allowableMisalignment
     ){
-        console.log("video misalignment: " + misalignment);
+        console.log("video misalignment: " + misalignment + "s");
+        console.log(
+            "element.current: ",videoTrack[0].element.currentTime,
+            "clip.start: ",videoTrack[0].startTime,
+            "clip.relative: ",videoTrack[0].relativeStartTime,
+            "preview.now: ",preview.nowTime
+        );
+
         timer.stop();
         videoTrack[0].element.currentTime = preview.nowTime - (videoTrack[0].startTime - videoTrack[0].relativeStartTime);
         await wait_seek(videoTrack[0].element);
@@ -347,6 +360,7 @@ async function processVideoTrack(videoTrack){
             dx = (canvas.width - width)/2;
         }
 
+        console.log("draw");
         ctx_tmp.drawImage(videoTrack[0].element, dx, dy, width, height);
 
         //描画
