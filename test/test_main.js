@@ -25,6 +25,16 @@ document.getElementById("play")
 });
 
 
+document.getElementById("seektest")
+.addEventListener("click",()=>{
+    let time = 0;
+    setInterval(() => {
+        videoEditorCore.preview.seekTo(time);
+        time+=0.3;
+    }, 1000);
+});
+
+
 // 書き出し
 document.getElementById("encode")
 .addEventListener("click",()=>{

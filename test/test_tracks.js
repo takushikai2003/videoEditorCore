@@ -7,6 +7,9 @@ videoElement.src = "./media/ABCDE.mp4";
 await waitEvent(videoElement, "loadeddata");
 videos["v0"] = {audioBuffer: await genAudioBuffer("./media/720p.mp4")};
 
+document.getElementById("videostate")
+.appendChild(videoElement);
+
 const imageElement = document.createElement("img");
 imageElement.src = "./media/mountain.jpg";
 
@@ -23,7 +26,7 @@ export const videoTrack = [
         element: videoElement,
         startTime: 0.0,
         endTime: 4.1,
-        relativeStartTime: 0,
+        relativeStartTime: 2,
         gain: 1,
         // filter: "gpu.sepia",
     }),

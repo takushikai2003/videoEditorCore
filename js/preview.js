@@ -322,7 +322,8 @@ async function processVideoTrack(videoTrack){
         );
 
         timer.stop();
-        videoTrack[0].element.currentTime = preview.nowTime - (videoTrack[0].startTime - videoTrack[0].relativeStartTime);
+        // videoTrack[0].element.currentTime = preview.nowTime - (videoTrack[0].startTime - videoTrack[0].relativeStartTime);
+        videoTrack[0].element.currentTime = Math.max(videoTrack[0].relativeStartTime, preview.nowTime - videoTrack[0].startTime + videoTrack[0].relativeStartTime);//startTime(内部)に飛ぶ
         await wait_seek(videoTrack[0].element);
         timer.start();
     }
@@ -397,7 +398,8 @@ async function processAudioTrack(audioTrack){
     ){
         console.log("audio misalignment: " + misalignment);
         timer.stop();
-        audioTrack[0].element.currentTime = preview.nowTime - (audioTrack[0].startTime - audioTrack[0].relativeStartTime);
+        // audioTrack[0].element.currentTime = preview.nowTime - (audioTrack[0].startTime - audioTrack[0].relativeStartTime);
+        audioTrack[0].element.currentTime = Math.max(audioTrack[0].relativeStartTime, preview.nowTime - audioTrack[0].startTime + audioTrack[0].relativeStartTime);//startTime(内部)に飛ぶ
         await wait_seek(audioTrack[0].element);
         timer.start();
     }
