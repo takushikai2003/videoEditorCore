@@ -28,7 +28,7 @@ export const preview = {
         ctx = canvas.getContext("2d");
         c_tmp.width = config.preview.width;
         c_tmp.height = config.preview.height;
-        LENA_GPU = new LenaGPU({width: config.preview.width, height: config.preview.height})
+        LENA_GPU = new LenaGPU({width: config.preview.width, height: config.preview.height});
     },
     nowTime: 0,//再生時の現在位置[s]
     length: 0,//プレビューの長さ[s]
@@ -38,7 +38,7 @@ export const preview = {
     onTimeUpdate: function(){},
     onStart: function(){},
     onEnd: function(){},
-    onAudioStreamAvailable: function(){},
+    // onAudioStreamAvailable: function(){},
     seeking: false,
 
     // previewの長さを計算してpreview.lengthにセットする
@@ -145,9 +145,9 @@ export const preview = {
             }
             catch(e){}
 
-            const streamdest = audioCtx.createMediaStreamDestination();
-            emptyNode.connect(streamdest);
-            preview.onAudioStreamAvailable(streamdest.stream);
+            // const streamdest = audioCtx.createMediaStreamDestination();
+            // emptyNode.connect(streamdest);
+            // preview.onAudioStreamAvailable(streamdest.stream);
         }
 
 
@@ -159,8 +159,7 @@ export const preview = {
             preview.seeking = true;
             
             await computeFrame(videoTrackCopy, audioTrackCopy, effectTrackCopy, keyframeEffectTrackCopy);
-            preview.pause();
-            console.log("preview seeked");
+            preview.pause(true);
             preview.seeking = false;
             return;
         }
@@ -193,7 +192,7 @@ export const preview = {
 
 
     //return: 何秒時点で止まったか
-    pause: function(){
+    pause: function(seek=false){
 
         timer.stop();
         timer.reset();
@@ -207,7 +206,9 @@ export const preview = {
             audioTrackCopy[0].element.pause();
         }
 
-        console.log("preview stopped");
+        if(!seek){
+            console.log("preview stopped");
+        }
 
         preview.playing = false;
         
@@ -239,6 +240,7 @@ async function computeFrame(videoTrack, audioTrack, effectTrack, keyframeEffectT
     await processVideoTrack(videoTrack);
 
     //frameに対して動画のエフェクトをかけられる
+    // TODO: gpu.sepia以外のGPU実装（動作未確認のため実装してない）
     let imagedata = ctx_tmp.getImageData(0, 0, canvas.width, canvas.height);
     
     if(videoTrack.length != 0){
@@ -253,6 +255,7 @@ async function computeFrame(videoTrack, audioTrack, effectTrack, keyframeEffectT
                 canvasEffects.sepia(imagedata.data);
                 break;
             case "gpu.sepia":
+                // await canvasEffects.gpu.sepia(c_tmp, c_tmp);//TODO: これが正解では？LENA_GPUがこことcanvasEffects.jsの二箇所で初期化されている
                 await LENA_GPU.sepia(c_tmp, c_tmp);
                 imagedata = ctx_tmp.getImageData(0, 0, canvas.width, canvas.height);
                 break;
@@ -267,7 +270,6 @@ async function computeFrame(videoTrack, audioTrack, effectTrack, keyframeEffectT
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.putImageData(imagedata, 0, 0);
-    // LENA_GPU.sepia(canvas, canvas);
 
     processEffectTrack(effectTrack);
     processKeyframeEffectTrack(keyframeEffectTrack)
@@ -286,7 +288,7 @@ async function processVideoTrack(videoTrack){
     
     let misalignment; //本来の位置とのずれ[s]
 
-    if(videoTrack[0]!=undefined &&
+    if(videoTrack[0] != undefined &&
         videoTrack[0].element.tagName == "VIDEO"
     ){
         misalignment = Math.abs(videoTrack[0].element.currentTime + videoTrack[0].startTime - videoTrack[0].relativeStartTime - preview.nowTime);
@@ -294,12 +296,13 @@ async function processVideoTrack(videoTrack){
 
     //今のelmが再生されていなければ
     if(
-        videoTrack[0]!=undefined &&
+        videoTrack[0] != undefined &&
         videoTrack[0].element.tagName == "VIDEO" &&
         videoTrack[0].element.paused == true &&
         preview.nowTime >= videoTrack[0].startTime //いるのか微妙
     ){
-        videoTrack[0].element.currentTime = Math.max(videoTrack[0].relativeStartTime, preview.nowTime - videoTrack[0].startTime);//startTime(内部)に飛ぶ
+        // TODO：videoTrack[0].internalStartTimeが採用される場合があるか確認.ずれの確認用？
+        videoTrack[0].element.currentTime = Math.max(videoTrack[0].relativeStartTime, preview.nowTime - videoTrack[0].startTime + videoTrack[0].relativeStartTime);//startTime(内部)に飛ぶ
         videoAudioGain.gain.value = videoTrack[0].gain;//gain
         
         await videoTrack[0].element.play();
@@ -307,21 +310,14 @@ async function processVideoTrack(videoTrack){
 
     //play中かつズレていれば
     else if(
-        videoTrack[0]!=undefined &&
+        videoTrack[0] != undefined &&
         videoTrack[0].element.paused == false &&
         misalignment > preview.allowableMisalignment
     ){
         console.log("video misalignment: " + misalignment + "s");
-        console.log(
-            "element.current: ",videoTrack[0].element.currentTime,
-            "clip.start: ",videoTrack[0].startTime,
-            "clip.relative: ",videoTrack[0].relativeStartTime,
-            "preview.now: ",preview.nowTime
-        );
 
         timer.stop();
-        // videoTrack[0].element.currentTime = preview.nowTime - (videoTrack[0].startTime - videoTrack[0].relativeStartTime);
-        videoTrack[0].element.currentTime = Math.max(videoTrack[0].relativeStartTime, preview.nowTime - videoTrack[0].startTime + videoTrack[0].relativeStartTime);//startTime(内部)に飛ぶ
+        videoTrack[0].element.currentTime = preview.nowTime - (videoTrack[0].startTime - videoTrack[0].relativeStartTime);
         await wait_seek(videoTrack[0].element);
         timer.start();
     }
@@ -338,7 +334,7 @@ async function processVideoTrack(videoTrack){
     }
 
     //毎フレーム描画
-    if(videoTrack[0]!=undefined && preview.nowTime >= videoTrack[0].startTime){
+    if(videoTrack[0] != undefined && preview.nowTime >= videoTrack[0].startTime){
         const elm_width = videoTrack[0].element.width || videoTrack[0].element.videoWidth;
         const elm_height = videoTrack[0].element.height || videoTrack[0].element.videoHeight;
         
@@ -360,16 +356,12 @@ async function processVideoTrack(videoTrack){
         }
 
         ctx_tmp.drawImage(videoTrack[0].element, dx, dy, width, height);
-
-        //描画
-        // ctx.drawImage(videoTrack[0].element, dx, dy, width, height);
-        
     }
 }
 
 
 async function processAudioTrack(audioTrack){
-    if(audioTrack[0]==undefined){
+    if(audioTrack[0] == undefined){
         return;
     }
 
@@ -381,11 +373,10 @@ async function processAudioTrack(audioTrack){
         audioTrack[0].element.paused == true &&
         preview.nowTime >= audioTrack[0].startTime //いるのか微妙
     ){
-        audioTrack[0].element.currentTime = Math.max(audioTrack[0].relativeStartTime, preview.nowTime - audioTrack[0].startTime);//startTime(内部)に飛ぶ
+        audioTrack[0].element.currentTime = Math.max(audioTrack[0].relativeStartTime, preview.nowTime - audioTrack[0].startTime + audioTrack[0].relativeStartTime);//startTime(内部)に飛ぶ
         audioGain.gain.value = audioTrack[0].gain;
 
-        await audioTrack[0].element.play();//awaitしたほうがいいかも
-        // await wait_play(audioTrack[0].element);
+        await audioTrack[0].element.play();
     }
 
     //play中かつズレていれば
@@ -395,8 +386,7 @@ async function processAudioTrack(audioTrack){
     ){
         console.log("audio misalignment: " + misalignment);
         timer.stop();
-        // audioTrack[0].element.currentTime = preview.nowTime - (audioTrack[0].startTime - audioTrack[0].relativeStartTime);
-        audioTrack[0].element.currentTime = Math.max(audioTrack[0].relativeStartTime, preview.nowTime - audioTrack[0].startTime + audioTrack[0].relativeStartTime);//startTime(内部)に飛ぶ
+        audioTrack[0].element.currentTime = preview.nowTime - (audioTrack[0].startTime - audioTrack[0].relativeStartTime);
         await wait_seek(audioTrack[0].element);
         timer.start();
     }
@@ -413,11 +403,11 @@ async function processAudioTrack(audioTrack){
 
 function processEffectTrack(effectTrack){
 
-    if(effectTrack[0]!=undefined && preview.nowTime > effectTrack[0].endTime){ //endTimeを超えていたら
+    if(effectTrack[0] != undefined && preview.nowTime > effectTrack[0].endTime){ //endTimeを超えていたら
         effectTrack.shift();//次のobjへ
     }
 
-    if(effectTrack[0]!=undefined && preview.nowTime >= effectTrack[0].startTime){ //startTime以上なら
+    if(effectTrack[0] != undefined && preview.nowTime >= effectTrack[0].startTime){ //startTime以上なら
         //描画処理へ
         for(let i=0; i<effectTrack[0].effect.length; i++){//内部のeffectの長さ分
             effectTrack[0].effect[i].function(effectTrack[0].effect[i].arguments);
@@ -461,12 +451,12 @@ function compileKeyframeEffectTrack(keyframeEffectTrack){
 
 function processKeyframeEffectTrack(keyframeEffectTrack){
 
-    if(keyframeEffectTrack[0]!=undefined && preview.nowTime > keyframeEffectTrack[0].endTime){ //endTimeを超えていたら
+    if(keyframeEffectTrack[0] != undefined && preview.nowTime > keyframeEffectTrack[0].endTime){ //endTimeを超えていたら
         keyframeEffectTrack.shift();//次のKeyframeEffectへ
     }
 
     // .length==0じゃだめ？
-    if(keyframeEffectTrack[0]==undefined){
+    if(keyframeEffectTrack[0] == undefined){
         return;
     }
 
@@ -508,14 +498,6 @@ function wait_seek(elm){
         });
     });
 }
-
-// function wait_play(elm){
-//     return new Promise(resolve=>{
-//         elm.addEventListener("play",()=>{
-//             resolve();
-//         });
-//     });
-// }
 
 function wait(ms){
     return new Promise(resolve=>{

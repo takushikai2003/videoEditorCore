@@ -26,7 +26,7 @@ export const encoder = {
 
 // encoder.encode()は、makeTrackなどをした上で呼ぶ必要がある
 //----------------------------------------------------------------
-async function encode(){
+async function encode(fileName){
 
     encoder.status = "start";
     encoder.onStatusChange(encoder.status);
@@ -65,7 +65,7 @@ async function encode(){
     
         const blob = await videoEditorEncoder.finalize();
         const url = URL.createObjectURL(blob);
-        download(url, "test.mp4");
+        download(url, `${fileName}.mp4`);
         encoder.status = "finished";
         encoder.onStatusChange(encoder.status);
         console.log(`encoding finished in ${(performance.now() - encodingStartTime)/1000}s`);
@@ -75,6 +75,7 @@ async function encode(){
         encoder.onStatusChange(encoder.status);
         console.error(e);
         alert(e);
+        console.error(e);
     });
 
 }
