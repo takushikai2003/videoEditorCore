@@ -22,13 +22,14 @@ await waitEvent(audioElement, "loadeddata");
 audios["a0"] = {audioBuffer: await genAudioBuffer(audioSrc)}
 
 
+const offset = 2;//[s]
 export const videoTrack = [
     new VideoClip({
         mediaId: "v0",
         element: videoElement,
         startTime: 0.0,
-        endTime: 4.1,
-        relativeStartTime: 2,
+        endTime: videoElement.duration - offset,
+        relativeStartTime: offset,
         gain: 1,
         // filter: "gpu.sepia",
     }),

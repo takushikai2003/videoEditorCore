@@ -75,6 +75,7 @@ export const preview = {
         preview.nowTime = startTime;
 
         //トラックの深いコピー
+        // TODO:エンコードやシーク時、毎回トラックのコピーをしている？か確認。そうなら遅いかも
         videoTrackCopy = videoEditorCore.videoTrack.map(list=>({...list}));
         audioTrackCopy = videoEditorCore.audioTrack.map(list=>({...list}));
         effectTrackCopy = videoEditorCore.effectTrack.map(list=>({...list}));
