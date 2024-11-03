@@ -4,7 +4,6 @@ import { config } from "../config.js";
 import { canvasEffects } from "./canvasEffects.js";
 
 const timer = new Timer();
-let LENA_GPU;
 
 let canvas;
 let ctx;
@@ -28,7 +27,6 @@ export const preview = {
         ctx = canvas.getContext("2d");
         c_tmp.width = config.preview.width;
         c_tmp.height = config.preview.height;
-        LENA_GPU = new LenaGPU({width: config.preview.width, height: config.preview.height});
     },
     nowTime: 0,//再生時の現在位置[s]
     length: 0,//プレビューの長さ[s]
@@ -256,8 +254,7 @@ async function computeFrame(videoTrack, audioTrack, effectTrack, keyframeEffectT
                 canvasEffects.sepia(imagedata.data);
                 break;
             case "gpu.sepia":
-                // await canvasEffects.gpu.sepia(c_tmp, c_tmp);//TODO: これが正解では？LENA_GPUがこことcanvasEffects.jsの二箇所で初期化されている
-                await LENA_GPU.sepia(c_tmp, c_tmp);
+                await canvasEffects.gpu.sepia(c_tmp, c_tmp);
                 imagedata = ctx_tmp.getImageData(0, 0, canvas.width, canvas.height);
                 break;
             default:

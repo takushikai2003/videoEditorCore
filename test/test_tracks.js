@@ -2,7 +2,7 @@ import { VideoClip, AudioClip, EffectClip, Effect, Keyframe, KeyframeEffect } fr
 import { genAudioBuffer } from "./genAudioBuffer.js";
 import { canvasEffects } from "../js/canvasEffects.js";
 
-const videoSrc = "./media/ABCDE.mp4";
+const videoSrc = "./media/720p.mp4";
 const videoElement = document.createElement("video");
 videoElement.src = videoSrc;
 await waitEvent(videoElement, "loadeddata");
@@ -31,7 +31,7 @@ export const videoTrack = [
         endTime: videoElement.duration - offset,
         relativeStartTime: offset,
         gain: 1,
-        // filter: "gpu.sepia",
+        filter: "gpu.sepia",
     }),
 ];
 
