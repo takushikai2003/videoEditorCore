@@ -2,22 +2,24 @@ import { VideoClip, AudioClip, EffectClip, Effect, Keyframe, KeyframeEffect } fr
 import { genAudioBuffer } from "./genAudioBuffer.js";
 import { canvasEffects } from "../js/canvasEffects.js";
 
+const videoSrc = "./media/ABCDE.mp4";
 const videoElement = document.createElement("video");
-videoElement.src = "./media/ABCDE.mp4";
+videoElement.src = videoSrc;
 await waitEvent(videoElement, "loadeddata");
-videos["v0"] = {audioBuffer: await genAudioBuffer("./media/720p.mp4")};
+videos["v0"] = {audioBuffer: await genAudioBuffer(videoSrc)};
 
 document.getElementById("videostate")
 .appendChild(videoElement);
 
 const imageElement = document.createElement("img");
 imageElement.src = "./media/mountain.jpg";
-
-const audioElement = document.createElement("audio");
-audioElement.src = "./media/HighwayStar.mp3";
-await waitEvent(audioElement, "loadeddata");
 await waitEvent(imageElement, "load");
-audios["a0"] = {audioBuffer: await genAudioBuffer("./media/HighwayStar.mp3")}
+
+const audioSrc = "./media/HighwayStar.mp3";
+const audioElement = document.createElement("audio");
+audioElement.src = audioSrc;
+await waitEvent(audioElement, "loadeddata");
+audios["a0"] = {audioBuffer: await genAudioBuffer(audioSrc)}
 
 
 export const videoTrack = [
