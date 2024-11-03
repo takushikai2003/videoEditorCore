@@ -2,7 +2,7 @@ import { VideoClip, AudioClip, EffectClip, Effect, Keyframe, KeyframeEffect } fr
 import { genAudioBuffer } from "./genAudioBuffer.js";
 import { canvasEffects } from "../js/canvasEffects.js";
 
-const videoSrc = "./media/720p.mp4";
+const videoSrc = "./media/ABCDE.mp4";
 const videoElement = document.createElement("video");
 videoElement.src = videoSrc;
 await waitEvent(videoElement, "loadeddata");
@@ -36,35 +36,35 @@ export const videoTrack = [
 ];
 
 export const audioTrack = [
-    // new AudioClip({
-    //     mediaId: "a0",
-    //     element: audioElement,
-    //     startTime: 0,
-    //     endTime: 5,
-    //     relativeStartTime: 0,
-    //     gain: 1,
-    // }),
+    new AudioClip({
+        mediaId: "a0",
+        element: audioElement,
+        startTime: 0,
+        endTime: 5,
+        relativeStartTime: 0,
+        gain: 1,
+    }),
 ];
 
 export const effectTrack = [
-    // new EffectClip({
-    //     startTime:0,
-    //     endTime:10,
-    //     effects:[
-    //         new Effect(
-    //             canvasEffects.addText,
-    //             {
-    //                 text: "あああ",
-    //                 size: 100,
-    //                 positionX:"center",
-    //                 positionY:"center",
-    //                 backgroundColor:"red",
-    //                 underLine: "blue",
-    //                 rotate: 30
-    //             }
-    //         )
-    //     ]
-    // })
+    new EffectClip({
+        startTime:0,
+        endTime:10,
+        effects:[
+            new Effect(
+                canvasEffects.addText,
+                {
+                    text: "あああ",
+                    size: 100,
+                    positionX:"center",
+                    positionY:"center",
+                    backgroundColor:"red",
+                    underLine: "blue",
+                    rotate: 30
+                }
+            )
+        ]
+    })
 ];
 
 const keyframes = [
@@ -74,7 +74,7 @@ const keyframes = [
 ];
 
 export const keyframeEffectTrack = [
-    // new KeyframeEffect(keyframes, 0, 10)
+    new KeyframeEffect(keyframes, 0, 10)
 ];
 
 

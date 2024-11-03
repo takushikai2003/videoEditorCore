@@ -57,7 +57,7 @@ void setVideoTrack(videoTrack)
 videoEditorCore.preview.seekTo(time);//time:ジャンプする時間[秒]
 
 //書き出し
-videoEditorCore.encoder.encode();//ダウンロードまで行われる
+videoEditorCore.encoder.encode("テスト動画");//ダウンロードまで行われる
 ```
 
 【5.必要に応じて、都度videoTrack,audioTrack,effectTrackをセットする】
