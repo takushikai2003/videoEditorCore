@@ -69,7 +69,7 @@ videoEditorCore.encoder.encode();//ダウンロードまで行われる
 [trackのプロパティ]
 ・トラックの各クリップは、以下のプロパティを必ず持つ必要があります。
 videoTrack内のクリップ
-    .mediaId
+    .id : mediaIdのこと
     .element
     .startTime
     .endTime
@@ -77,7 +77,7 @@ videoTrack内のクリップ
     .gain
 
 audioTrack内のクリップ
-    .mediaId
+    .id
     .element
     .startTime
     .endTime

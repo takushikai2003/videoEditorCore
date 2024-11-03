@@ -3,7 +3,7 @@ class Clip {
         // this.id = Clip.nextId();
         this.startTime = startTime;
         this.endTime = endTime;
-        this.mediaId = mediaId;
+        this.id = mediaId;
     }
 
     

@@ -12,9 +12,6 @@ KeyframeEffect[]
     -endTime
 
 
-
-Clip.uniqueid → Clip.mediaId//将来的にクリップのidが必要になる可能性があるため、メディアのid（"v0"など）とは分ける
-
 ※プロパティ名の変更
 Clip.overallStartTime→Clip.startTime
 Clip.overallEndTime→Clip.endTime

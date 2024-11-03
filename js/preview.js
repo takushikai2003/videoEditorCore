@@ -283,8 +283,6 @@ async function computeFrame(videoTrack, audioTrack, effectTrack, keyframeEffectT
 
 //per frame
 async function processVideoTrack(videoTrack){
-
-    console.log(videoTrack);
     
     let misalignment; //本来の位置とのずれ[s]
 
@@ -361,7 +359,6 @@ async function processVideoTrack(videoTrack){
             dx = (canvas.width - width)/2;
         }
 
-        console.log("draw");
         ctx_tmp.drawImage(videoTrack[0].element, dx, dy, width, height);
 
         //描画
