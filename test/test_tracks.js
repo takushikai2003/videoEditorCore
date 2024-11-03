@@ -1,6 +1,6 @@
 import { VideoClip, AudioClip, EffectClip, Effect, Keyframe, KeyframeEffect } from "./generateClip.js";
 import { genAudioBuffer } from "./genAudioBuffer.js";
-import canvasEffects from "../js/canvasEffects.js";
+import { canvasEffects } from "../js/canvasEffects.js";
 
 const videoElement = document.createElement("video");
 videoElement.src = "./media/ABCDE.mp4";

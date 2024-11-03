@@ -1,4 +1,4 @@
-class Timer{
+export class Timer{
     constructor(){
         this.time = 0;
         this.onTimeUpdate = function(){};
@@ -43,6 +43,3 @@ class Timer{
         this.started = false;
     }
 }
-
-
-export default Timer;

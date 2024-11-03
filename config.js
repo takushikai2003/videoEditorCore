@@ -1,4 +1,4 @@
-const config = {
+export const config = {
     preview:{
         canvas: null,
         // FPS: 15,
@@ -17,5 +17,3 @@ const config = {
     },
     // language: "ja",
 }
-
-export default config;

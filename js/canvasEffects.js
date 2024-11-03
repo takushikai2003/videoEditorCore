@@ -4,7 +4,7 @@
 
 const LENA_GPU = new LenaGPU({width: 10, height: 10});
 
-const canvasEffects = {
+export const canvasEffects = {
     init(width, height){
         LENA_GPU.width = width;
         LENA_GPU.height = height;
@@ -227,7 +227,3 @@ function negativeInverte(data){
 
 //TODO:
 //クロマキー合成（グリーンバック）
-
-
-
-export default canvasEffects;

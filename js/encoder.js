@@ -1,4 +1,4 @@
-import videoEditorCore from "../videoEditorCore.js";
+import { videoEditorCore } from "../videoEditorCore.js";
 import { videoEditorEncoder } from "../videoEditorEncoder/videoEditorEncoder.js";
 const canvas = document.getElementById("main_canvas");
 const ctx = canvas.getContext("2d");
@@ -6,7 +6,7 @@ const ctx = canvas.getContext("2d");
 // videoEditorEncoder側はまだ30固定
 const FPS = 30;
 
-const encoder = {
+export const encoder = {
     length: 0,
     frames: 0,
     progress: 0,
@@ -87,6 +87,3 @@ function download(url, fileName){
     anchor.click();
     anchor.remove();
 }
-
-
-export default encoder;

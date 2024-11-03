@@ -1,9 +1,9 @@
-import encoder from "./js/encoder.js";
-import canvasEffects from "./js/canvasEffects.js";
-import preview from "./js/preview.js";
-import config from "./config.js";
+import { encoder } from "./js/encoder.js";
+import { canvasEffects } from "./js/canvasEffects.js";
+import { preview } from "./js/preview.js";
+import { config } from "./config.js";
 
-const videoEditorCore = {};
+export const videoEditorCore = {};
 
 function init(canvas){
     config.preview.width = canvas.width;
@@ -46,6 +46,3 @@ videoEditorCore.setKeyframeEffectTrack = function(keyframeEffectTrack){
     videoEditorCore.keyframeEffectTrack = keyframeEffectTrack;
     videoEditorCore.preview.calcLength();
 }
-
-
-export default videoEditorCore;

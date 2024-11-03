@@ -1,4 +1,4 @@
-import videoEditorCore from "../videoEditorCore.js";
+import { videoEditorCore } from "../videoEditorCore.js";
 import { videoTrack, audioTrack, effectTrack, keyframeEffectTrack } from "./test_tracks.js";
 
 const canvas = document.getElementById("main_canvas");

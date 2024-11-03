@@ -1,7 +1,7 @@
-import Timer from "../timer.js";
-import videoEditorCore from "../videoEditorCore.js";
-import config from "../config.js";
-import canvasEffects from "./canvasEffects.js";
+import { Timer } from "../timer.js";
+import { videoEditorCore } from "../videoEditorCore.js";
+import { config } from "../config.js";
+import { canvasEffects } from "./canvasEffects.js";
 
 const timer = new Timer();
 let LENA_GPU;
@@ -22,7 +22,7 @@ let audioCtx, emptyNode, audioGain, videoAudioGain;
 
 let addedElements = [];//createMediaElementSource()に追加されたもの
 
-const preview = {
+export const preview = {
     init: function(){
         canvas = config.preview.canvas;
         ctx = canvas.getContext("2d");
@@ -524,6 +524,3 @@ function wait(ms){
         }, ms);
     });
 }
-
-
-export default preview;
