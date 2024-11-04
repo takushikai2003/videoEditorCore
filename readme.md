@@ -1,4 +1,4 @@
-#Video Editor Core
+# Video Editor Core
 
 * videoEditorのコア部分です。主に、動画のプレビュー,書き出し(エンコード)の機能を提供します。
 * init()実行時に引数として受け取ったcanvas要素にプレビューを描画します。
