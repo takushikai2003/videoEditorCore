@@ -1,4 +1,4 @@
-export function addImage({ canvas, image, config }) {
+export function drawImage({ canvas, image, config }) {
     const ctx = canvas.getContext("2d");
 
     config.positionX = config.positionX || 0;

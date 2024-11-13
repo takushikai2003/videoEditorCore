@@ -3,7 +3,7 @@
 //どれを取るかは、利用法を考えた上での最速を。
 
 import { drawText } from "./effects/drawText.js";
-import { addImage } from "./effects/addImage.js";
+import { drawImage } from "./effects/drawImage.js";
 import { monochrome } from "./effects/monochrome.js";
 import { negativeInverte } from "./effects/negativeInverte.js";
 import { sepia } from "./effects/sepia.js";
@@ -37,7 +37,7 @@ export const canvasEffects = {
         }
     },
     drawText: drawText,
-    addImage: addImage,
+    drawImage: drawImage,
     monochrome: monochrome,
     sepia: sepia,
     negativeInverte: negativeInverte,
