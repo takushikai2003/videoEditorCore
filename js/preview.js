@@ -316,7 +316,7 @@ async function processVideoTrack(videoTrack){
         videoTrack[0].element.paused == true &&
         preview.nowTime >= videoTrack[0].startTime //いるのか微妙
     ){
-        // TODO：videoTrack[0].internalStartTimeが採用される場合があるか確認.ずれの確認用？
+        // TODO：videoTrack[0].relativeStartTimeが採用される場合があるか確認.ずれの確認用？
         videoTrack[0].element.currentTime = Math.max(videoTrack[0].relativeStartTime, preview.nowTime - videoTrack[0].startTime + videoTrack[0].relativeStartTime);//startTime(内部)に飛ぶ
         videoAudioGain.gain.value = videoTrack[0].gain;//gain
         
