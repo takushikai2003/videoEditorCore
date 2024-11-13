@@ -6,18 +6,19 @@
 
 export function drawText(config) {
     const canvas = config.canvas;
-    const text = config.text;
     const ctx = canvas.getContext("2d");
 
-    // config.size = config.size;//str
-    config.font = config.font || "Arial";
-    config.color = config.color || "#000000";
-    config.bold = (config.bold == true) ? "bold" : "";
-    config.italic = (config.italic == true) ? "italic" : "";
-    config.positionX = config.positionX || 0;
-    config.positionY = config.positionY || 0;
-    config.underline = config.underline || false;
-    config.backgroundColor = config.backgroundColor || false;
+    const text = config.text;
+
+    const font = config.font || "Arial";
+    const color = config.color || "#000000";
+    const bold = (config.bold == true) ? "bold" : "";
+    const italic = (config.italic == true) ? "italic" : "";
+    // config.positionX = config.positionX || 0;
+    // config.positionY = config.positionY || 0;
+    const underline = config.underline || false;
+    const backgroundColor = config.backgroundColor || false;
+    const rotate = config.rotate;
 
     let size;
 
@@ -29,11 +30,8 @@ export function drawText(config) {
         //textがcanvas幅いっぱいになると見にくいので、canvas幅の2/3をMAXに
         const textWidthMAX = canvas.width * 2 / 3;
 
-        const _bold = (config.bold == true) ? "bold" : "";
-        const _italic = (config.italic == true) ? "italic" : "";
-
         while (true) {
-            ctx.font = _italic + " " + _bold + " " + font_size + "pt" + " " + config.font;
+            ctx.font = italic + " " + bold + " " + font_size + "pt" + " " + font;
             // ctxFontEdited = true;
             const textWidth = ctx.measureText(text).width;
 
@@ -54,9 +52,10 @@ export function drawText(config) {
     else {
         size = config.size + "pt";
     }
+    
 
     ctx.save();
-    ctx.font = config.italic + " " + config.bold + " " + size + " " + config.font;
+    ctx.font = italic + " " + bold + " " + size + " " + font;
     ctx.textAlign = "start";
     ctx.textBaseline = "top";
 
@@ -90,36 +89,27 @@ export function drawText(config) {
     // 回転の中心位置を計算（画像の中心を回転中心にする）
     const cx = positionX + textWidth / 2;
     const cy = positionY + textHeight / 2;
-    const rad = config.rotate / 180 * Math.PI;
+    const rad = rotate / 180 * Math.PI;
     // 画像を回転
     ctx.setTransform(Math.cos(rad), Math.sin(rad), -Math.sin(rad), Math.cos(rad), cx - cx * Math.cos(rad) + cy * Math.sin(rad), cy - cx * Math.sin(rad) - cy * Math.cos(rad));
 
     //背景色
-    if (config.backgroundColor != false) {
-        const mesure = ctx.measureText(text);
-        const textWidth = mesure.width;
-        const textHeight = mesure.actualBoundingBoxAscent + mesure.actualBoundingBoxDescent;
-
+    if (backgroundColor != false) {
         //ピッタリすぎるので5px広く
-        ctx.fillStyle = config.backgroundColor;
+        ctx.fillStyle = backgroundColor;
         ctx.fillRect(positionX - 5, positionY - 5, textWidth + 10, textHeight + 10);
     }
 
     //アンダーライン
-    if (config.underline != false) {
-
-        const mesure = ctx.measureText(text);
-        const textWidth = mesure.width;
-        const textHeight = mesure.actualBoundingBoxAscent + mesure.actualBoundingBoxDescent;
-
+    if (underline != false) {
         ctx.beginPath();
         ctx.moveTo(positionX, positionY + textHeight);
         ctx.lineTo(positionX + textWidth, positionY + textHeight);
-        ctx.strokeStyle = config.underline;
+        ctx.strokeStyle = underline;
         ctx.stroke();
     }
 
-    ctx.fillStyle = config.color;
+    ctx.fillStyle = color;
     ctx.fillText(text, positionX, positionY);
     ctx.restore();
 }

@@ -63,7 +63,8 @@ export const effectTrack = [
                     positionY:"center",
                     backgroundColor:"red",
                     underline: "blue",
-                    rotate: 30
+                    rotate: 30,
+                    color:"yellow"
                 }
             )
         ]
