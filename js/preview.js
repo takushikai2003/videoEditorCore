@@ -39,7 +39,10 @@ export const preview = {
     // onAudioStreamAvailable: function(){},
     seeking: false,
 
-    // previewの長さを計算してpreview.lengthにセットする
+    /**
+     * previewの長さを計算してpreview.lengthにセットする
+     * @return {number} previewの長さを返す
+     */
     calcLength: function(){
         const videoTrack = videoEditorCore.videoTrack;
         const audioTrack = videoEditorCore.audioTrack;
@@ -67,7 +70,12 @@ export const preview = {
         return preview.length;
     },
     
-    //arg: startTime：途中から再生[秒]
+    /**
+     * プレビューを再生する
+     * @param {number} startTime 途中から再生[秒]
+     * @param {boolean} [encode] trueなら音声が再生されない
+     * @param {boolean} [seek] trueならcomputeFrameは一度だけ実行
+     */
     play: async function(startTime = 0, encode=false, seek=false){
 
         preview.nowTime = startTime;
@@ -153,7 +161,7 @@ export const preview = {
         // キーフレームをコンパイル
         compileKeyframeEffectTrack(keyframeEffectTrackCopy);
 
-        //seekならcomputeFrameは一度だけ
+        // seekならcomputeFrameは一度だけ
         if(seek){
             preview.seeking = true;
             
@@ -190,7 +198,11 @@ export const preview = {
     },
 
 
-    //return: 何秒時点で止まったか
+    /**
+     * プレビューを停止する
+     * @param {boolean} [seek]
+     * @return {number} 何秒時点で止まったか
+     */
     pause: function(seek=false){
 
         timer.stop();
@@ -215,6 +227,11 @@ export const preview = {
     },
 
 
+    /**
+     * 指定時間に飛ぶ
+     * @param {number} startTime 
+     * @param {boolean} [encode]
+     */
     seekTo: async function(startTime, encode=false){
         if(preview.seeking){
             return;
