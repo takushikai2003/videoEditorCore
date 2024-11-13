@@ -2,7 +2,7 @@
 //TODO: 改行対応
 // fontsize:autoやunderなどの複雑な処理はUIに任せるか？
 // (↑単純に中心なら良いが、そこから少しずらすなどするならプロパティが増える)
-export function addText(config) {
+export function drawText(config) {
     let canvas = config.canvas;
     const text = config.text;
     if (canvas == undefined) {

@@ -52,7 +52,7 @@ export const effectTrack = [
         endTime:10,
         effects:[
             new Effect(
-                canvasEffects.addText,
+                canvasEffects.drawText,
                 {
                     text: "あああ",
                     size: 100,
@@ -68,9 +68,9 @@ export const effectTrack = [
 ];
 
 const keyframes = [
-    new Keyframe(0, canvasEffects.addText, {size:0, positionX:0}, {text: "あああ", positionY:"center",rotate: 0}),
-    new Keyframe(3, canvasEffects.addText, {size:100, positionX:50}, {text: "あああ", positionY:"center",rotate: 0}),
-    new Keyframe(10, canvasEffects.addText, {size:0, positionX:100}, {text: "あああ", positionY:"center",rotate: 0}),
+    new Keyframe(0, canvasEffects.drawText, {size:0, positionX:0}, {text: "あああ", positionY:"center",rotate: 0}),
+    new Keyframe(3, canvasEffects.drawText, {size:100, positionX:50}, {text: "あああ", positionY:"center",rotate: 0}),
+    new Keyframe(10, canvasEffects.drawText, {size:0, positionX:100}, {text: "あああ", positionY:"center",rotate: 0}),
 ];
 
 export const keyframeEffectTrack = [

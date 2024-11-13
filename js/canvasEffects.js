@@ -2,7 +2,7 @@
 //引数、戻り値が、canvasやctxのときと、data(RGBA)のときがあるので注意
 //どれを取るかは、利用法を考えた上での最速を。
 
-import { addText } from "./effects/addText.js";
+import { drawText } from "./effects/drawText.js";
 import { addImage } from "./effects/addImage.js";
 import { monochrome } from "./effects/monochrome.js";
 import { negativeInverte } from "./effects/negativeInverte.js";
@@ -36,7 +36,7 @@ export const canvasEffects = {
             sobelVertical: LENA_GPU.sobelVertical.bind(LENA_GPU),
         }
     },
-    addText: addText,
+    drawText: drawText,
     addImage: addImage,
     monochrome: monochrome,
     sepia: sepia,
