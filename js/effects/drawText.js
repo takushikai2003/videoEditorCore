@@ -4,6 +4,35 @@
 // (↑単純に中心なら良いが、そこから少しずらすなどするならプロパティが増える)
 // (↑KeyFrameの補完時、centerの計算などはどうする？)
 
+// JSDocは以下のよう記述で必須とオプショナルのプロパティを指定できる
+//  * @property {string} email 必須
+//  * @property {string} [nickName] オプショナル
+
+/**
+ * canvasにテキストを描く
+ * @param {Object} config
+ * 
+ * ---必須---
+ * 
+ * @param {HTMLCanvasElement} config.canvas 
+ * @param {number | "auto"} config.size フォントサイズ[pt]
+ * @param {number | "left" | "center" | "right"} config.positionX
+ * @param {number | "above" | "center" | "under"} config.positionY
+ * @param {string} config.text　表示したいテキスト
+ * 
+ * ---オプション---
+ * 
+ * @param {string} [config.font]　フォント名
+ * @param {string} [config.color] 文字色
+ * @param {boolean} [config.bold] 太字
+ * @param {boolean} [config.italic] 斜体
+ * @param {string} [config.underline] 下線を描く場合は色を指定
+ * @param {string} [config.backgroundColor] 文字背景を塗る場合は色を指定
+ * @param {number} [config.rotate] 回転角[度degree]
+ * @param {boolean} [config.gradation_enable] グラデーションを行うかどうか
+ * @param {string[]} [config.gradation_arr] グラデーションの色配列
+ */
+
 export function drawText(config) {
     const canvas = config.canvas;
     const ctx = canvas.getContext("2d");
@@ -14,14 +43,15 @@ export function drawText(config) {
     const color = config.color || "#000000";
     const bold = (config.bold == true) ? "bold" : "";
     const italic = (config.italic == true) ? "italic" : "";
-    // config.positionX = config.positionX || 0;
-    // config.positionY = config.positionY || 0;
     const underline = config.underline || false;
     const backgroundColor = config.backgroundColor || false;
-    const rotate = config.rotate;
+    const rotate = config.rotate || 0;
+
+    let gradation_enable = config.gradation_enable;
+    const gradation_arr = config.gradation_arr;
+
 
     let size;
-
 
     if (config.size == "auto") {
 
@@ -52,7 +82,7 @@ export function drawText(config) {
     else {
         size = config.size + "pt";
     }
-    
+
 
     ctx.save();
     ctx.font = italic + " " + bold + " " + size + " " + font;
@@ -100,6 +130,27 @@ export function drawText(config) {
         ctx.fillRect(positionX - 5, positionY - 5, textWidth + 10, textHeight + 10);
     }
 
+
+    //グラデーション
+    let grad;
+    if(gradation_enable){
+        grad = ctx.createLinearGradient(positionX, positionY, textWidth, textHeight);
+
+        const length = gradation_arr.length;
+        if(length == 0){
+            gradation_enable = false;
+        }
+        const step = Math.round((1 / length)*100)/100;//小数第2位で四捨五入
+        for(let i=0; i<length; i++){
+            if(i == length-1){
+                grad.addColorStop(1.0, gradation_arr[i]);
+            }
+            else{
+                grad.addColorStop(step * i, gradation_arr[i]);
+            }
+        }
+    }
+
     //アンダーライン
     if (underline != false) {
         ctx.beginPath();
@@ -109,7 +160,13 @@ export function drawText(config) {
         ctx.stroke();
     }
 
-    ctx.fillStyle = color;
+    if(gradation_enable){
+        ctx.fillStyle = grad;
+    }
+    else{
+        ctx.fillStyle = color;
+    }
+
     ctx.fillText(text, positionX, positionY);
     ctx.restore();
 }

@@ -64,7 +64,10 @@ export const effectTrack = [
                     backgroundColor:"red",
                     underline: "blue",
                     rotate: 30,
-                    color:"yellow"
+                    color:"yellow",
+
+                    gradation_enable: true,
+                    gradation_arr: ["red", "green", "yellow"]
                 }
             )
         ]
