@@ -89,8 +89,8 @@ export function drawText(config) {
     ctx.textAlign = "start";
     ctx.textBaseline = "top";
 
-    const textWidth = ctx.measureText(text).width;
     const mesure = ctx.measureText(text);
+    const textWidth = mesure.width;
     const textHeight = mesure.actualBoundingBoxAscent + mesure.actualBoundingBoxDescent;
 
     let positionX = config.positionX;
