@@ -2,12 +2,11 @@
 //TODO: 改行対応
 // fontsize:autoやunderなどの複雑な処理はUIに任せるか？
 // (↑単純に中心なら良いが、そこから少しずらすなどするならプロパティが増える)
+// (↑KeyFrameの補完時、centerの計算などはどうする？)
+
 export function drawText(config) {
-    let canvas = config.canvas;
+    const canvas = config.canvas;
     const text = config.text;
-    if (canvas == undefined) {
-        canvas = document.getElementById("main_canvas");
-    }
     const ctx = canvas.getContext("2d");
 
     // config.size = config.size;//str
