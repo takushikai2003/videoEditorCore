@@ -16,7 +16,7 @@ export function drawText(config) {
     config.italic = (config.italic == true) ? "italic" : "";
     config.positionX = config.positionX || 0;
     config.positionY = config.positionY || 0;
-    config.underLine = config.underLine || false;
+    config.underline = config.underline || false;
     config.backgroundColor = config.backgroundColor || false;
 
     let size;
@@ -106,7 +106,7 @@ export function drawText(config) {
     }
 
     //アンダーライン
-    if (config.underLine != false) {
+    if (config.underline != false) {
 
         const mesure = ctx.measureText(text);
         const textWidth = mesure.width;
@@ -115,7 +115,7 @@ export function drawText(config) {
         ctx.beginPath();
         ctx.moveTo(positionX, positionY + textHeight);
         ctx.lineTo(positionX + textWidth, positionY + textHeight);
-        ctx.strokeStyle = config.underLine;
+        ctx.strokeStyle = config.underline;
         ctx.stroke();
     }
 
