@@ -48,36 +48,46 @@ export const audioTrack = [
     }),
 ];
 
+
+const effects = [];
+const x_positions = ["left", "center", "right"];
+const y_positions = ["above", "center", "under"];
+for(const x of x_positions){
+    for(const y of y_positions){
+        const effect = new Effect(
+            canvasEffects.drawText,
+                {
+                    canvas: canvas,
+                    text: `あ ${x} ${y} g`,
+                    size: 10,
+                    positionX: x,
+                    positionY: y,
+                    backgroundColor: "red",
+                    underline: "blue",
+                    rotate: 0,
+                    color: "yellow",
+
+                    gradation_enable: false,
+                    gradation_arr: ["red", "green", "yellow"]
+                }
+        );
+
+        effects.push(effect);
+    }
+}
+
 export const effectTrack = [
     new EffectClip({
         startTime:0,
         endTime:10,
-        effects:[
-            new Effect(
-                canvasEffects.drawText,
-                {
-                    canvas: canvas,
-                    text: "あああ",
-                    size: 100,
-                    positionX:"center",
-                    positionY:"center",
-                    backgroundColor:"red",
-                    underline: "blue",
-                    rotate: 30,
-                    color:"yellow",
-
-                    gradation_enable: true,
-                    gradation_arr: ["red", "green", "yellow"]
-                }
-            )
-        ]
+        effects:effects,
     })
 ];
 
 const keyframes = [
-    new Keyframe(0, canvasEffects.drawText, {size:0, positionX:0}, {canvas:canvas, text: "あああ", positionY:"center",rotate: 0}),
-    new Keyframe(3, canvasEffects.drawText, {size:100, positionX:50}, {canvas:canvas, text: "あああ", positionY:"center",rotate: 0}),
-    new Keyframe(10, canvasEffects.drawText, {size:0, positionX:100}, {canvas:canvas, text: "あああ", positionY:"center",rotate: 0}),
+    new Keyframe(0, canvasEffects.drawText, {rotate:0}, {size: 50, positionX:"center", canvas:canvas, text: "あああ", positionY:"center"}),
+    new Keyframe(3, canvasEffects.drawText, {rotate:90}, {size: 50, positionX:"center", canvas:canvas, text: "あああ", positionY:"center"}),
+    new Keyframe(10, canvasEffects.drawText, {rotate:180}, {size: 50, positionX:"center", canvas:canvas, text: "あああ", positionY:"center"}),
 ];
 
 export const keyframeEffectTrack = [
