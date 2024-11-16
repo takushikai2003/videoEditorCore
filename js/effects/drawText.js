@@ -107,13 +107,13 @@ export function drawText(config) {
     }
 
     if (config.positionY == "above") {
-        positionY = textHeight * 1.5;
+        positionY = 0;
     }
     else if (config.positionY == "center") {
-        positionY = (canvas.height / 2) + (textHeight / 2);
+        positionY = (canvas.height - textHeight) / 2;
     }
     else if (config.positionY == "under") {
-        positionY = canvas.height; // - 30;// -30で下からちょっと上へ
+        positionY = canvas.height - textHeight; // - 30;// -30で下からちょっと上へ
     }
 
     // 回転の中心位置を計算（画像の中心を回転中心にする）

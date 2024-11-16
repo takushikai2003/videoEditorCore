@@ -85,9 +85,9 @@ export const effectTrack = [
 ];
 
 const keyframes = [
-    new Keyframe(0, canvasEffects.drawText, {rotate:0}, {size: 50, positionX:"center", canvas:canvas, text: "あああ", positionY:"center"}),
-    new Keyframe(3, canvasEffects.drawText, {rotate:90}, {size: 50, positionX:"center", canvas:canvas, text: "あああ", positionY:"center"}),
-    new Keyframe(10, canvasEffects.drawText, {rotate:180}, {size: 50, positionX:"center", canvas:canvas, text: "あああ", positionY:"center"}),
+    new Keyframe(0, canvasEffects.drawText, {rotate:0}, {underline:"green", size: 50, positionX:"center", canvas:canvas, text: "あああabgp", positionY:"center"}),
+    new Keyframe(3, canvasEffects.drawText, {rotate:90}, {underline:"green", size: 50, positionX:"center", canvas:canvas, text: "あああabgp", positionY:"center"}),
+    new Keyframe(10, canvasEffects.drawText, {rotate:180}, {underline:"green", size: 50, positionX:"center", canvas:canvas, text: "あああabgp", positionY:"center"}),
 ];
 
 export const keyframeEffectTrack = [
