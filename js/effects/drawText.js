@@ -134,7 +134,7 @@ export function drawText(config) {
     //グラデーション
     let grad;
     if(gradation_enable){
-        grad = ctx.createLinearGradient(positionX, positionY, textWidth, textHeight);
+        grad = ctx.createLinearGradient(positionX, positionY, positionX + textWidth, positionY + textHeight);
 
         const length = gradation_arr.length;
         if(length == 0){

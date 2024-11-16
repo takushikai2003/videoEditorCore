@@ -67,7 +67,7 @@ for(const x of x_positions){
                     rotate: 0,
                     color: "yellow",
 
-                    gradation_enable: false,
+                    gradation_enable: true,
                     gradation_arr: ["red", "green", "yellow"]
                 }
         );
