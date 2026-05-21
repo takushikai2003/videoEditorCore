@@ -25,7 +25,7 @@ const videoAudioGain = audioCtx.createGain();
 
 let addedElements = [];//createMediaElementSource()に追加されたもの
 
-function prepareTracks(startTime, videoTrack, audioTrack, effectTrack, keyframeEffectTrack, encode=false){
+function prepareTracks(startTime){
     // トラックの深いコピー。ただしstartTime以前のクリップを除外
     const videoTrackCopy = videoEditorCore.videoTrack.filter(clip => clip.endTime >= startTime).map(list=>({...list}));
     const audioTrackCopy = videoEditorCore.audioTrack.filter(clip => clip.endTime >= startTime).map(list=>({...list}));
@@ -70,21 +70,9 @@ function prepareTracks(startTime, videoTrack, audioTrack, effectTrack, keyframeE
     }
 
 
-    if(!encode){
-        // エンコードでなければ、音声を出力する
-        emptyNode.connect(audioCtx.destination);
-    }
-    else {
-        try{
-            emptyNode.disconnect(audioCtx.destination);
-        }
-        catch(e){}
 
-        // const streamdest = audioCtx.createMediaStreamDestination();
-        // emptyNode.connect(streamdest);
-        // preview.onAudioStreamAvailable(streamdest.stream);
-    }
-
+    // 音声を出力
+    emptyNode.connect(audioCtx.destination);
 
     
     // キーフレームをコンパイル
@@ -154,9 +142,14 @@ export const preview = {
         preview.nowTime = startTime;
         preview.calcLength();
 
+        // ★【追加】audioCtx が居眠り(suspended)していたら、ここで完全に起こす！
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+
         // トラックの準備
         const { videoTrackCopy, audioTrackCopy, effectTrackCopy, keyframeEffectTrackCopy }
-        = prepareTracks(startTime, videoEditorCore.videoTrack, videoEditorCore.audioTrack, videoEditorCore.effectTrack, videoEditorCore.keyframeEffectTrack);        
+        = prepareTracks(startTime);        
 
         _videoTrackCopy = videoTrackCopy; _audioTrackCopy = audioTrackCopy; _effectTrackCopy = effectTrackCopy; _keyframeEffectTrackCopy = keyframeEffectTrackCopy;
 
@@ -212,10 +205,9 @@ export const preview = {
 
     /**
      * 指定時間に飛ぶ
-     * @param {number} startTime 
-     * @param {boolean} [encode]
+     * @param {number} startTime
      */
-    seekTo: async function(startTime, encode=false){
+    seekTo: async function(startTime){
         if(preview.seeking){
             return;
         }
@@ -223,22 +215,17 @@ export const preview = {
         preview.nowTime = startTime;
         preview.calcLength();
 
-        const { videoTrackCopy, audioTrackCopy, effectTrackCopy, keyframeEffectTrackCopy }
-        = prepareTracks(startTime, videoEditorCore.videoTrack, videoEditorCore.audioTrack, videoEditorCore.effectTrack, videoEditorCore.keyframeEffectTrack);        
+        const { videoTrackCopy, audioTrackCopy, effectTrackCopy, keyframeEffectTrackCopy } = prepareTracks(startTime);
 
         // seekではcomputeFrameを一度だけ
-        if(seek){
-            preview.seeking = true;
-            
-            await computeFrame(startTime, videoTrackCopy, audioTrackCopy, effectTrackCopy, keyframeEffectTrackCopy);
-            preview.seeking = false;
-            return;
-        }
+        preview.seeking = true;
+        
+        await computeFrame(startTime, videoTrackCopy, audioTrackCopy, effectTrackCopy, keyframeEffectTrackCopy);
+        preview.seeking = false;
+        return;
 
-        if(!encode){
-            console.log("preview seeked");
-        }
-
+        console.log("preview seeked");
+        
         return;
     }
 }
