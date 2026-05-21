@@ -12,7 +12,8 @@ function init(canvas){
 
     config.encoder.canvas = canvas;
 
-    preview.init();
+    preview.init(canvas);
+    encoder.init(canvas);
     canvasEffects.init(config.preview.width, config.preview.height)
 }
 
