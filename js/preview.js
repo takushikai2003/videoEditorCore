@@ -1,4 +1,4 @@
-import { Timer } from "../timer.js";
+import { Timer } from "../Timer.js";
 import { videoEditorCore } from "../videoEditorCore.js";
 import { config } from "../config.js";
 import { canvasEffects } from "./canvasEffects.js";
