@@ -2,6 +2,8 @@ import { Timer } from "../Timer.js";
 import { videoEditorCore } from "../videoEditorCore.js";
 import { config } from "../config.js";
 import { canvasEffects } from "./canvasEffects.js";
+import { calcLength } from "./calcLength.js";
+import { processKeyframeEffectTrack, compileKeyframeEffectTrack } from "./processKeyframeEffectTrack.js";
 
 const timer = new Timer();
 
@@ -32,8 +34,6 @@ function prepareTracks(startTime){
     const effectTrackCopy = videoEditorCore.effectTrack.filter(clip => clip.endTime >= startTime).map(list=>({...list}));
     const keyframeEffectTrackCopy = videoEditorCore.keyframeEffectTrack.map(list=>({...list}));
 
-
-    compileKeyframeEffectTrack(keyframeEffectTrackCopy);
 
     // MediaElementSource の接続        
     // MediaElementSourceの作成
@@ -83,34 +83,13 @@ function prepareTracks(startTime){
 
 
 
-function calcLength(videoTrack, audioTrack, effectTrack, keyframeEffectTrack){
-
-    //previewLengthの値を決定
-    let videoLength=0, effectLength=0, audioLength=0, keyframeEffectLength=0;
-
-    if(videoTrack.length != 0){
-        videoLength = videoTrack[videoTrack.length - 1].endTime;
-    }
-    if(effectTrack.length != 0){
-        effectLength = effectTrack[effectTrack.length - 1].endTime;
-    }
-    if(audioTrack.length != 0){
-        audioLength = audioTrack[audioTrack.length - 1].endTime;
-    }
-    if(keyframeEffectTrack.length != 0){
-        keyframeEffectLength = keyframeEffectTrack[keyframeEffectTrack.length - 1].endTime;
-    }
-
-    return Math.max(videoLength, effectLength, audioLength, keyframeEffectLength);
-}
-    
 
 export const preview = {
-    init: function(){
-        canvas = config.preview.canvas;
+    init: function(_canvas){
+        canvas = _canvas;
         ctx = canvas.getContext("2d");
-        c_tmp.width = config.preview.width;
-        c_tmp.height = config.preview.height;
+        c_tmp.width = canvas.width;
+        c_tmp.height = canvas.height;
     },
     nowTime: 0,//再生時の現在位置[s]
     length: 0,//プレビューの長さ[s]
@@ -414,79 +393,6 @@ function processEffectTrack(time, effectTrack){
 
 }
 
-
-// 再生前に一度だけ、各keyframeの数式係数を決定する
-// (とりあえずlinearのみ)
-function compileKeyframeEffectTrack(keyframeEffectTrack){
-
-    for(let i=0; i<keyframeEffectTrack.length; i++){
-        for(let j=0; j<keyframeEffectTrack[i].keyframes.length; j++){
-            const keyframe = keyframeEffectTrack[i].keyframes[j];
-            const nextKeyframe = keyframeEffectTrack[i].keyframes[j+1];
-
-            if(nextKeyframe == undefined){
-                break;
-            }
-
-            // 係数保存用
-            keyframe.coefficients = [];//{key,a,b}
-            // linear
-            // f(t) = at + b の係数a,bを決定する
-            Object.entries(keyframe.dynamicArguments)
-            .forEach(arr=>{
-                const key = arr[0];
-                const value = arr[1];
-                const a = (nextKeyframe.dynamicArguments[key] - value) / (nextKeyframe.startTime - keyframe.startTime);
-                const b = value - (a * keyframe.startTime);
-                keyframe.coefficients.push({key: key, a: a, b: b});
-            });
-           
-        }
-    }
-
-}
-
-
-function processKeyframeEffectTrack(time, keyframeEffectTrack){
-
-    if(keyframeEffectTrack[0] != undefined && time > keyframeEffectTrack[0].endTime){ //endTimeを超えていたら
-        keyframeEffectTrack.shift();//次のKeyframeEffectへ
-    }
-
-    // .length==0じゃだめ？
-    if(keyframeEffectTrack[0] == undefined){
-        return;
-    }
-
-    // 次の要素のstartTimeがtimeを超えていたらそれより前の要素を削除する
-    for(let i=0; i<keyframeEffectTrack[0].keyframes.length; i++){
-        const keyframe = keyframeEffectTrack[0].keyframes[i];
-        
-        if(keyframe.startTime >= time){
-            keyframeEffectTrack[0].keyframes = keyframeEffectTrack[0].keyframes.slice(i-1);
-            break;
-        }
-    }
-
-    //startTime以上なら、キーフレームの実行を開始する
-    if(time >= keyframeEffectTrack[0].keyframes[0].startTime){
-        const keyframe = keyframeEffectTrack[0].keyframes[0];
-        const args = {};
-        // 動的引数の値を計算して決定する
-        keyframe.coefficients.forEach(obj=>{
-            // f(t) = at + b
-            args[obj.key] = obj.a * time + obj.b;
-        });
-
-        // 静的引数を結合
-        Object.assign(args, keyframe.staticArguments);
-
-        //描画処理へ
-        keyframeEffectTrack[0].keyframes[0].function(args);
-        
-    }
-
-}
 
 
 function wait_seek(elm){

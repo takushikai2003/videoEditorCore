@@ -35,8 +35,8 @@ document.getElementById("seektest")
 });
 
 
-// // 書き出し
-// document.getElementById("encode")
-// .addEventListener("click",()=>{
-//     videoEditorCore.encoder.encode("test video");
-// });
+// 書き出し
+document.getElementById("encode")
+.addEventListener("click",()=>{
+    videoEditorCore.encoder.encode("test video");
+});
